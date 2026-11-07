@@ -21,8 +21,12 @@ export type DeviceReading = {
   climate: boolean;
   temp: number;
   hood: boolean;
+  coverPosition: number | null;
 };
 export type DeviceState = Record<DeviceKey, DeviceReading>;
+
+export const coverDeviceKeys = ["sala", "escritorio", "suite", "quarto2", "quarto3"] as const satisfies readonly DeviceKey[];
+export type CoverDeviceKey = (typeof coverDeviceKeys)[number];
 
 export const climateDeviceKeys = [
   "sala",
@@ -44,6 +48,7 @@ export type SmartHomeCommand =
   | { deviceKey: DeviceKey; capability: "light" }
   | { deviceKey: DeviceKey; capability: "climate" }
   | { deviceKey: DeviceKey; capability: "hood" }
+  | { deviceKey: CoverDeviceKey; capability: "cover"; position: number }
   | { deviceKey: DeviceKey; capability: "temperature"; delta: -1 | 1 };
 
 export type HouseSnapshot = {
@@ -54,18 +59,18 @@ export type HouseSnapshot = {
 };
 
 export const initialSimulationState: DeviceState = {
-  sala: { light: true, climate: true, temp: 22, hood: false },
-  jantar: { light: false, climate: false, temp: 23, hood: false },
-  cozinha: { light: true, climate: false, temp: 23, hood: false },
-  escritorio: { light: true, climate: true, temp: 22, hood: false },
-  lavanderia: { light: false, climate: false, temp: 24, hood: false },
-  garagem: { light: false, climate: false, temp: 25, hood: false },
-  suite: { light: false, climate: true, temp: 21, hood: false },
-  quarto2: { light: false, climate: false, temp: 22, hood: false },
-  quarto3: { light: false, climate: false, temp: 22, hood: false },
-  churrasqueira: { light: false, climate: false, temp: 24, hood: false },
-  lavabo: { light: false, climate: false, temp: 23, hood: false },
-  banheiro: { light: false, climate: false, temp: 23, hood: false },
-  banhoSuite: { light: false, climate: false, temp: 22, hood: false },
-  jardim: { light: false, climate: false, temp: 24, hood: false },
+  sala: { light: true, climate: true, temp: 22, hood: false, coverPosition: 0 },
+  jantar: { light: false, climate: false, temp: 23, hood: false, coverPosition: null },
+  cozinha: { light: true, climate: false, temp: 23, hood: false, coverPosition: null },
+  escritorio: { light: true, climate: true, temp: 22, hood: false, coverPosition: 0 },
+  lavanderia: { light: false, climate: false, temp: 24, hood: false, coverPosition: null },
+  garagem: { light: false, climate: false, temp: 25, hood: false, coverPosition: null },
+  suite: { light: false, climate: true, temp: 21, hood: false, coverPosition: 0 },
+  quarto2: { light: false, climate: false, temp: 22, hood: false, coverPosition: 0 },
+  quarto3: { light: false, climate: false, temp: 22, hood: false, coverPosition: 0 },
+  churrasqueira: { light: false, climate: false, temp: 24, hood: false, coverPosition: null },
+  lavabo: { light: false, climate: false, temp: 23, hood: false, coverPosition: null },
+  banheiro: { light: false, climate: false, temp: 23, hood: false, coverPosition: null },
+  banhoSuite: { light: false, climate: false, temp: 22, hood: false, coverPosition: null },
+  jardim: { light: false, climate: false, temp: 24, hood: false, coverPosition: null },
 };

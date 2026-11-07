@@ -1,17 +1,45 @@
-flowchart LR
-    Q[Quadro elétrico residencial<br/>proteções a dimensionar] --> G[Hub local único<br/>Home Assistant proposto · não configurado]
-    G --> S[Sensores<br/>temperatura, umidade, presença e abertura]
-    G --> A[Interfaces e atuadores<br/>compatíveis com as cargas]
-    G <--> N[Rede local<br/>Wi-Fi / Ethernet a definir]
-    subgraph C[Centrais fixas · clientes da mesma casa]
-        P1[Painel touchscreen<br/>Escritório · atalhos próprios]
-        P2[Painel touchscreen<br/>Suíte · atalhos próprios]
+flowchart TB
+    subgraph CLIENTES[Clientes da mesma casa]
+        P1[Painel fixo · Escritório<br/>favoritos próprios]
+        P2[Painel fixo · Suíte<br/>favoritos próprios]
+        APP[PWA no celular]
     end
-    N <--> P1
-    N <--> P2
-    A --> H[Climatização<br/>zonas independentes]
-    A --> L[Iluminação<br/>comandos por ambiente]
-    A --> E[Exaustão<br/>coifa da cozinha e churrasqueira]
-    Q -. circuitos próprios .-> H
+
+    subgraph BACKEND[CASA+ · arquitetura atual de desenvolvimento]
+        API[Express + tRPC<br/>snapshot · comandos · SSE · allowlist]
+        DB[(SQLite local<br/>estado simulado · desenvolvimento)]
+        LLM[Serviço LLM gerenciado<br/>somente texto · pode consumir créditos]
+        API --> DB
+        API <--> LLM
+    end
+    P1 --> API
+    P2 --> API
+    APP --> API
+
+    subgraph RESIDENCIA[Residência · integração física futura]
+        SAT[Microfone / satélite dedicado<br/>wake word local · hardware a definir]
+        HA[Home Assistant<br/>hub residencial proposto]
+        S[Sensores ambientais<br/>e de abertura]
+        ACT[Interfaces e atuadores<br/>dimensionados por carga]
+        SAT -. áudio permanece na casa .-> HA
+        HA --> S
+        HA --> ACT
+        ACT --> H[Climatização<br/>zonas aprovadas]
+        ACT --> L[Iluminação]
+        ACT --> E[Exaustão<br/>coifa e churrasqueira]
+        ACT --> C[Coberturas motorizadas<br/>blackout: 4 ambientes<br/>cortina: sala]
+    end
+
+    API -. Home Assistant futuro .-> HA
+    HA <-->|somente transcrição após wake word / intenção allowlisted| API
+    Q[Quadro elétrico<br/>dimensionamento profissional] -. circuitos de potência separados .-> H
     Q -. circuitos próprios .-> L
     Q -. circuitos próprios .-> E
+    Q -. motores conforme vãos .-> C
+
+    classDef software fill:#eaf4ee,stroke:#668b73,color:#1e3525,stroke-width:1px;
+    classDef future fill:#f0edfb,stroke:#8474b8,color:#2f2850,stroke-width:1px;
+    classDef physical fill:#fff3de,stroke:#b49555,color:#4a3a1b,stroke-width:1px;
+    class P1,P2,APP,API,DB,LLM software;
+    class SAT,HA future;
+    class S,ACT,H,L,E,C,Q physical;

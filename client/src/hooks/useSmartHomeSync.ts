@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
-import { initialSimulationState, type DeviceKey, type SmartHomeScene, type ToggleCapability } from "@shared/smart-home";
+import { initialSimulationState, type CoverDeviceKey, type DeviceKey, type SmartHomeScene, type ToggleCapability } from "@shared/smart-home";
 
 export type SyncStatus = "loading" | "connected" | "reconnecting" | "offline";
 
@@ -47,11 +47,17 @@ export function useSmartHomeSync() {
     };
   }, [invalidateSnapshot]);
 
-  const toggle = useCallback((deviceKey: DeviceKey, capability: ToggleCapability) =>
-    commandMutation.mutateAsync({ deviceKey, capability }), [commandMutation.mutateAsync]);
+  const toggle = useCallback((deviceKey: DeviceKey, capability: ToggleCapability) => {
+    if (capability === "light") return commandMutation.mutateAsync({ deviceKey, capability: "light" });
+    if (capability === "climate") return commandMutation.mutateAsync({ deviceKey, capability: "climate" });
+    return commandMutation.mutateAsync({ deviceKey, capability: "hood" });
+  }, [commandMutation.mutateAsync]);
 
   const adjustTemperature = useCallback((deviceKey: DeviceKey, delta: -1 | 1) =>
     commandMutation.mutateAsync({ deviceKey, capability: "temperature", delta }), [commandMutation.mutateAsync]);
+
+  const setCoverPosition = useCallback((deviceKey: CoverDeviceKey, position: number) =>
+    commandMutation.mutateAsync({ deviceKey, capability: "cover", position }), [commandMutation.mutateAsync]);
 
   const applyScene = useCallback((scene: SmartHomeScene) =>
     sceneMutation.mutateAsync({ scene }), [sceneMutation.mutateAsync]);
@@ -70,6 +76,7 @@ export function useSmartHomeSync() {
     error: snapshotQuery.error,
     toggle,
     adjustTemperature,
+    setCoverPosition,
     applyScene,
   };
 }

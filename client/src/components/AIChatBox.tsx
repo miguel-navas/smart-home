@@ -32,6 +32,9 @@ export type AIChatBoxProps = {
    */
   isLoading?: boolean;
 
+  /** Disable message submission when the upstream service is unavailable. */
+  disabled?: boolean;
+
   /**
    * Placeholder text for the input field
    */
@@ -114,6 +117,7 @@ export function AIChatBox({
   messages,
   onSendMessage,
   isLoading = false,
+  disabled = false,
   placeholder = "Type your message...",
   className,
   height = "600px",
@@ -212,7 +216,7 @@ export function AIChatBox({
                     <button
                       key={index}
                       onClick={() => onSendMessage(prompt)}
-                      disabled={isLoading}
+                      disabled={isLoading || disabled}
                       className="rounded-lg border border-border bg-card px-4 py-2 text-sm transition-colors hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {prompt}
@@ -315,12 +319,13 @@ export function AIChatBox({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="flex-1 max-h-32 resize-none min-h-9"
+          disabled={disabled}
           rows={1}
         />
         <Button
           type="submit"
           size="icon"
-          disabled={!input.trim() || isLoading}
+          disabled={!input.trim() || isLoading || disabled}
           className="shrink-0 h-[38px] w-[38px]"
         >
           {isLoading ? (

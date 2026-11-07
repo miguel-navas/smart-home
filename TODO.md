@@ -43,6 +43,24 @@
 - Usar fundo escuro nas telas das centrais, com cartões/superfícies contrastantes, texto legível e cores de status distinguíveis.
 - Não exibir lavabo, jardim de inverno, churrasqueira nem os dois banheiros como zonas de ar-condicionado. Não acionar hardware físico; todos os estados desta tela continuam identificados como demonstração.
 
+## [x] Persianas blackout e cortinas motorizadas — controle em todos os painéis
+- Prever persianas blackout motorizadas na suíte, nos quartos 2 e 3 e no escritório; prever cortinas motorizadas na sala de estar.
+- Mostrar o controle do dispositivo no cômodo correspondente e permitir que as duas centrais fixas, o app e o assistente CASA+ por texto controlem a casa toda.
+- Permitir abrir/fechar e ajustar a posição em faixa de 0–100% (0 = fechada; 100 = aberta); estados e comandos permanecem simulados e sincronizados pelo backend compartilhado entre central Escritório, central Suíte e app.
+- Não alegar que existe motor, persiana/cortina física ou integração Home Assistant conectada; hardware, canal de controle e calibração serão definidos posteriormente.
+
+## [x] Assistente CASA+ por texto e respostas faladas quando suportadas
+- Oferecer conversa em português sobre a casa e comandos simples; manter o texto como alternativa de interação e permitir a leitura audível da resposta quando a síntese de fala do navegador estiver disponível.
+- Neste protótipo, aceitar pelo assistente somente um comando explícito de posição por vez para persiana/cortina simulada; validar ambiente, tipo de cobertura, ação/posição e correspondência com a mensagem atual no backend antes de persistir, e não oferecer serviços ou entidades arbitrários.
+- Chamar o LLM do projeto exclusivamente pelo servidor; não expor credenciais no navegador. Informar que o texto e o snapshot simulado são processados pelo serviço e que o uso pode consumir créditos; manter as mensagens somente na tela durante a sessão.
+- Quando o backend estiver indisponível, bloquear envio; em erro não declarar sucesso. Limitar chamadas a 8 por minuto por usuário/IP nesta instância de desenvolvimento; isso não substitui autenticação/limite compartilhado em produção.
+- Os comandos físicos continuam desabilitados até a futura integração real; o assistente atua somente sobre o estado simulado e informa quando não compreender ou quando o backend estiver indisponível.
+
+## [ ] Palavra de ativação contínua com detecção local em satélite/microfone dedicado
+- O usuário escolheu palavra de ativação sempre ouvindo, com detecção local na residência e microfone/satélite dedicado; o áudio de espera pela palavra não deve ser transmitido continuamente a um serviço de nuvem.
+- Após a palavra ser detectada localmente, capturar o comando por um pipeline residencial; somente a transcrição poderá seguir para o serviço LLM do projeto após informar esse fluxo ao morador.
+- O protótipo React/PWA não deve afirmar que tem escuta contínua ativa nem pedir acesso contínuo ao microfone sem satélite/pipeline configurado; manter a integração real pendente até selecionar, instalar e validar o hardware e Home Assistant.
+
 ## [x] Backend compartilhado para simulação e sincronização das duas centrais
 - Criar a branch `feature/shared-backend-ha-simulation` a partir do estado aprovado, preservando a branch `main`.
 - Remover estado de dispositivos de `localStorage` e da memória do navegador. Os painéis do escritório (`/painel/escritorio`), da suíte (`/painel/suite`) e o app móvel devem ler o mesmo snapshot de dispositivos persistido no arquivo SQLite local do backend de desenvolvimento; a persistência deve sobreviver a atualização/reabertura de página e reinício do servidor. A SQLite desta etapa atende clientes da mesma instância de backend e não é armazenamento de produção para réplicas em hosts/contêineres distintos.

@@ -14,8 +14,11 @@ function Router() {
     <Route path="/plantas" component={Home} />
     <Route path="/materiais" component={Home} />
     <Route path="/circuitos" component={Home} />
+    <Route path="/assistente" component={Home} />
     <Route path="/painel/escritorio" component={Home} />
     <Route path="/painel/suite" component={Home} />
+    <Route path="/painel/escritorio/assistente" component={Home} />
+    <Route path="/painel/suite/assistente" component={Home} />
     <Route path="/404" component={NotFound} />
     <Route component={NotFound} />
   </Switch>;

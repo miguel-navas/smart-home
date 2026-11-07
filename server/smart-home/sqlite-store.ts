@@ -4,6 +4,7 @@ import { DatabaseSync } from "node:sqlite";
 import { TRPCError } from "@trpc/server";
 import {
   climateDeviceKeys,
+  coverDeviceKeys,
   deviceKeys,
   hoodDeviceKeys,
   initialSimulationState,
@@ -21,6 +22,7 @@ type DeviceRow = {
   climate_on: number;
   temperature: number;
   hood_on: number;
+  cover_position: number | null;
   updated_at: string;
 };
 
@@ -28,6 +30,7 @@ type SyncRow = { id: number; revision: number; updated_at: string };
 
 const climateKeySet = new Set<DeviceKey>(climateDeviceKeys);
 const hoodKeySet = new Set<DeviceKey>(hoodDeviceKeys);
+const coverKeySet = new Set<DeviceKey>(coverDeviceKeys);
 let database: DatabaseSync | undefined;
 
 function databasePath(): string {
@@ -57,6 +60,7 @@ function getDatabase(): DatabaseSync {
         climate_on INTEGER NOT NULL CHECK (climate_on IN (0, 1)),
         temperature INTEGER NOT NULL CHECK (temperature BETWEEN 16 AND 30),
         hood_on INTEGER NOT NULL CHECK (hood_on IN (0, 1)),
+        cover_position INTEGER CHECK (cover_position BETWEEN 0 AND 100),
         updated_at TEXT NOT NULL
       );
       CREATE TABLE IF NOT EXISTS smart_home_sync (
@@ -66,10 +70,15 @@ function getDatabase(): DatabaseSync {
       );
     `);
 
+    const columns = db.prepare("PRAGMA table_info(smart_home_devices)").all() as unknown as Array<{ name: string }>;
+    if (!columns.some(column => column.name === "cover_position")) {
+      db.exec("ALTER TABLE smart_home_devices ADD COLUMN cover_position INTEGER CHECK (cover_position BETWEEN 0 AND 100)");
+    }
+
     const seedDevice = db.prepare(`
       INSERT OR IGNORE INTO smart_home_devices
-        (device_key, light_on, climate_on, temperature, hood_on, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?)
+        (device_key, light_on, climate_on, temperature, hood_on, cover_position, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `);
     const seedTimestamp = new Date().toISOString();
     for (const deviceKey of deviceKeys) {
@@ -80,9 +89,12 @@ function getDatabase(): DatabaseSync {
         Number(initial.climate),
         initial.temp,
         Number(initial.hood),
+        initial.coverPosition,
         seedTimestamp,
       );
     }
+    const seedCover = db.prepare("UPDATE smart_home_devices SET cover_position = ? WHERE device_key = ? AND cover_position IS NULL");
+    for (const deviceKey of coverDeviceKeys) seedCover.run(initialSimulationState[deviceKey].coverPosition, deviceKey);
     db.prepare(`
       INSERT OR IGNORE INTO smart_home_sync (id, revision, updated_at)
       VALUES (1, 0, ?)
@@ -119,7 +131,7 @@ function toIsoTimestamp(value: string | undefined): string | null {
 }
 
 function readSnapshot(db: DatabaseSync): HouseSnapshot {
-  const rows = db.prepare("SELECT device_key, light_on, climate_on, temperature, hood_on, updated_at FROM smart_home_devices")
+  const rows = db.prepare("SELECT device_key, light_on, climate_on, temperature, hood_on, cover_position, updated_at FROM smart_home_devices")
     .all() as unknown as DeviceRow[];
   const syncRow = db.prepare("SELECT id, revision, updated_at FROM smart_home_sync WHERE id = 1")
     .get() as unknown as SyncRow | undefined;
@@ -142,6 +154,7 @@ function readSnapshot(db: DatabaseSync): HouseSnapshot {
       climate: Boolean(row.climate_on),
       temp: row.temperature,
       hood: Boolean(row.hood_on),
+      coverPosition: row.cover_position,
     }];
   })) as DeviceState;
 
@@ -183,7 +196,7 @@ class SqliteSmartHomeStore implements SmartHomeStateStore {
     const db = getDatabase();
     inTransaction(db, "IMMEDIATE", () => {
       const current = db.prepare(`
-        SELECT device_key, light_on, climate_on, temperature, hood_on, updated_at
+        SELECT device_key, light_on, climate_on, temperature, hood_on, cover_position, updated_at
         FROM smart_home_devices WHERE device_key = ?
       `).get(command.deviceKey) as unknown as DeviceRow | undefined;
       if (!current) {
@@ -206,6 +219,15 @@ class SqliteSmartHomeStore implements SmartHomeStateStore {
         }
         db.prepare("UPDATE smart_home_devices SET hood_on = ?, updated_at = ? WHERE device_key = ?")
           .run(Number(!current.hood_on), now, command.deviceKey);
+      } else if (command.capability === "cover") {
+        if (!coverKeySet.has(command.deviceKey)) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Este ambiente não possui persiana ou cortina no simulador." });
+        }
+        if (!Number.isInteger(command.position) || command.position < 0 || command.position > 100) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "A posição deve ser um número inteiro entre 0 e 100." });
+        }
+        db.prepare("UPDATE smart_home_devices SET cover_position = ?, updated_at = ? WHERE device_key = ?")
+          .run(command.position, now, command.deviceKey);
       } else {
         if (!climateKeySet.has(command.deviceKey)) {
           throw new TRPCError({ code: "BAD_REQUEST", message: "Este ambiente não possui uma zona de climatização." });

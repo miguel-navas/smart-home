@@ -14,6 +14,11 @@ Esta lista é uma base para orçamento após definição de marcas, protocolos, 
 | Controle | Interfaces/contatores aprovados para climatização | 1 interface por zona definida após revisão do layout; validar fabricante |
 | Controle | Módulos de comando de coifa e exaustão | Cozinha e churrasqueira; solução compatível a dimensionar |
 | Controle | Caixas, fontes e acessórios dos módulos | Conforme topologia e local de instalação |
+| Coberturas | Persianas blackout motorizadas na suíte, quartos 2 e 3 e escritório | 4 ambientes; quantidade de motores conforme número/largura dos vãos, a confirmar |
+| Coberturas | Cortina motorizada na sala de estar | 1 ambiente; quantidade de motores conforme vãos, a confirmar |
+| Coberturas | Interfaces/módulos de comando e comandos manuais para motores | Compatibilidade com motor, protocolo e operação de contingência a validar |
+| Voz local | Microfone/satélite dedicado com palavra de ativação local | Quantidade e posicionamento após teste de cobertura acústica; ainda não selecionado |
+| Voz local | Hardware/pipeline Home Assistant para wake word e processamento local de fala | Dimensionar após escolha de STT/TTS, frase de ativação e teste de qualidade em pt-BR |
 | Sensoriamento | Sensor de temperatura e umidade | Como referência, 1 por zona aprovada de climatização; quantidade final a definir |
 | Sensoriamento | Sensor de presença | Ambientes e cobertura a validar |
 | Sensoriamento | Sensor de abertura | Portas/janelas selecionadas após planta de esquadrias |
@@ -31,6 +36,7 @@ Esta lista é uma base para orçamento após definição de marcas, protocolos, 
 
 1. Confirmar município, recuos, orientação solar, cotas internas, aberturas e posição dos quadros. Validar o desenho esquemático com profissional local antes de dimensionar.
 2. Selecionar os dois painéis (tamanho, modelo, fixação, alimentação e rede) e confirmar que serão clientes de um único controlador; dimensionar o hub e o protocolo conforme os dispositivos.
-3. Escolher o gateway e o protocolo e validar integração e operação local sem internet.
-4. Fechar projeto elétrico, climatização e exaustão, incluindo separação de potência/controle e operação manual de contingência.
-5. Solicitar quantitativos e especificações a engenheiro eletricista, profissional de automação, projetista de climatização e instalador de exaustão.
+3. Escolher o gateway/protocolo e motores/atuadores compatíveis; confirmar quantos vãos haverá em cada cômodo e validar operação local/manual sem internet.
+4. Escolher o satélite/microfone após teste de cobertura acústica; validar palavra de ativação, STT/TTS e qualidade de português brasileiro. Não considerar áudio ambiente para nuvem; o fluxo CASA+ aprovado envia apenas transcrição após a ativação.
+5. Fechar projeto elétrico, climatização e exaustão, incluindo separação de potência/controle e operação manual de contingência.
+6. Solicitar quantitativos e especificações a engenheiro eletricista, profissional de automação/voz, projetista de climatização e instalador de exaustão.
