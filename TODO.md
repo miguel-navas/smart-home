@@ -35,6 +35,13 @@
 - Marcar estados e comandos como demonstrativos; nenhuma tela deve alegar que acionou equipamento real.
 - Incluir dois painéis fixos e acessórios de montagem/alimentação/rede a definir na lista preliminar; refletir os dois clientes no diagrama funcional.
 
+## [x] Tela inicial React otimizada para central provisória de 10 polegadas em paisagem
+- Nas rotas `/painel/escritorio` e `/painel/suite`, apresentar um layout inicial próprio para tela touch de 10 polegadas em paisagem; 10 polegadas é referência provisória de interface e não especifica modelo/resolução do equipamento.
+- Manter visíveis identificação do perfil, estado de conexão/sincronização do backend e aviso de modo demonstração; quando o backend não confirmar o estado, informar erro/indisponibilidade e desativar comandos em vez de indicar sucesso.
+- Exibir cenas rápidas, favoritos acionáveis do perfil local, resumo/acesso às zonas válidas de climatização e acesso a todos os ambientes; os dois painéis podem controlar a casa toda, mas mantêm favoritos diferentes e sincronizam o estado compartilhado.
+- Usar alvos principais de toque com pelo menos 48 px; conservar layout responsivo para celulares/PWA e para telas fora do modo paisagem.
+- Não exibir lavabo, jardim de inverno, churrasqueira nem os dois banheiros como zonas de ar-condicionado. Não acionar hardware físico; todos os estados desta tela continuam identificados como demonstração.
+
 ## [x] Backend compartilhado para simulação e sincronização das duas centrais
 - Criar a branch `feature/shared-backend-ha-simulation` a partir do estado aprovado, preservando a branch `main`.
 - Remover estado de dispositivos de `localStorage` e da memória do navegador. Os painéis do escritório (`/painel/escritorio`), da suíte (`/painel/suite`) e o app móvel devem ler o mesmo snapshot de dispositivos persistido no arquivo SQLite local do backend de desenvolvimento; a persistência deve sobreviver a atualização/reabertura de página e reinício do servidor. A SQLite desta etapa atende clientes da mesma instância de backend e não é armazenamento de produção para réplicas em hosts/contêineres distintos.

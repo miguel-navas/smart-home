@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { type DeviceKey, type DeviceState, type SmartHomeScene, type ToggleCapability } from "@shared/smart-home";
 import { useSmartHomeSync } from "../hooks/useSmartHomeSync";
+import FixedPanelHome from "../components/FixedPanelHome";
 
 type PanelProfile = "escritorio" | "suite";
 
@@ -64,6 +65,9 @@ function Overview({ state, toggle, scene, profile = null, controlsEnabled }: { s
   const profileName = profile === "escritorio" ? "Escritório" : "Suíte";
   const favoriteKeys: DeviceKey[] = profile === "suite" ? ["suite", "quarto2", "quarto3", "sala"] : ["escritorio", "sala", "jantar", "cozinha"];
   const quickRooms = profile ? rooms.filter(room => favoriteKeys.includes(room.key)) : rooms.slice(0, 4);
+  const climateRooms = rooms.filter(room => room.climate);
+  const activeClimateCount = climateRooms.filter(room => state[room.key].climate).length;
+  if (profile) return <FixedPanelHome profile={profile} controlsEnabled={controlsEnabled} activeClimateCount={activeClimateCount} climateZoneCount={climateRooms.length} onScene={scene} favoriteCards={quickRooms.map(room => <RoomCard key={room.key} room={room} state={state[room.key]} onLight={() => toggle(room.key, "light")} onClimate={() => toggle(room.key, "climate")} onHood={() => toggle(room.key, "hood")} controlsEnabled={controlsEnabled} />)} />;
   return <>
     <PageTitle eyebrow={profile ? `CENTRAL FIXA · ${profileName.toUpperCase()}` : "CASA · RESUMO"} title={profile ? (profile === "escritorio" ? "Painel do Escritório" : "Painel da Suíte") : "Sua casa, em equilíbrio."} subtitle={profile ? "Atalhos personalizados deste local; os controles dão acesso à casa toda." : "Status geral e comandos rápidos para os ambientes."} />
     {profile && <section className="station-profile-banner"><span className="station-profile-icon"><PanelTop size={20} /></span><div><strong>Central fixa · {profileName}</strong><span>Perfil de tela deste local. Ambas as centrais têm acesso a todos os ambientes.</span></div><div className="station-switcher" aria-label="Alternar entre centrais">{panelRoutes.map(panel => <Link key={panel.href} href={panel.href} className={panel.href.endsWith(profile) ? "selected" : ""}>{panel.label}</Link>)}</div></section>}
