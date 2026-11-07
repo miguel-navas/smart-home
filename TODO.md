@@ -49,6 +49,13 @@
 - Permitir abrir/fechar e ajustar a posição em faixa de 0–100% (0 = fechada; 100 = aberta); estados e comandos permanecem simulados e sincronizados pelo backend compartilhado entre central Escritório, central Suíte e app.
 - Não alegar que existe motor, persiana/cortina física ou integração Home Assistant conectada; hardware, canal de controle e calibração serão definidos posteriormente.
 
+## [x] Painel React dedicado para cortinas e persianas
+- Disponibilizar `/coberturas` e rotas dentro dos dois painéis (`/painel/escritorio/coberturas` e `/painel/suite/coberturas`) com controle dedicado, separado da lista geral de ambientes.
+- Apresentar os cinco dispositivos simulados: cortina da sala de estar e persianas blackout do escritório, suíte e quartos 2 e 3; agrupar por pavimento e identificar o cômodo e tipo de cobertura.
+- Exibir posição confirmada de 0–100%, permitir abrir, fechar e ajustar a posição por slider e posições rápidas; sincronizar comandos pelo hook tRPC/SSE e backend comum.
+- Desativar comandos sem snapshot confirmado ou quando o backend estiver indisponível; após falha, manter/retornar à última posição confirmada e informar que não houve confirmação.
+- Usar layout touch responsivo e o tema escuro das centrais, com rótulos acessíveis; deixar claro que os estados são demonstrativos e nenhum motor físico está conectado.
+
 ## [x] Assistente CASA+ por texto e respostas faladas quando suportadas
 - Oferecer conversa em português sobre a casa e comandos simples; manter o texto como alternativa de interação e permitir a leitura audível da resposta quando a síntese de fala do navegador estiver disponível.
 - Neste protótipo, aceitar pelo assistente somente um comando explícito de posição por vez para persiana/cortina simulada; validar ambiente, tipo de cobertura, ação/posição e correspondência com a mensagem atual no backend antes de persistir, e não oferecer serviços ou entidades arbitrários.

@@ -11,12 +11,14 @@ import { type CoverDeviceKey, type DeviceKey, type DeviceState, type SmartHomeSc
 import { useSmartHomeSync } from "../hooks/useSmartHomeSync";
 import FixedPanelHome from "../components/FixedPanelHome";
 import VoiceAssistant from "../components/VoiceAssistant";
+import CoveringsPanel from "../components/CoveringsPanel";
 
 type PanelProfile = "escritorio" | "suite";
 
 const nav = [
   { href: "/", label: "Visão geral", icon: House },
   { href: "/ambientes", label: "Ambientes", icon: Layers3 },
+  { href: "/coberturas", label: "Coberturas", icon: PanelTop },
   { href: "/climatizacao", label: "Climatização", icon: AirVent },
   { href: "/plantas", label: "Plantas", icon: PanelTop },
   { href: "/materiais", label: "Materiais", icon: BookOpen },
@@ -189,8 +191,10 @@ function CircuitsPage() {
 
 export default function Home() {
   const [path] = useLocation();
-  const panelProfile: PanelProfile | null = path === "/painel/escritorio" || path === "/painel/escritorio/assistente" ? "escritorio" : path === "/painel/suite" || path === "/painel/suite/assistente" ? "suite" : null;
+  const panelProfile: PanelProfile | null = path.startsWith("/painel/escritorio") ? "escritorio" : path.startsWith("/painel/suite") ? "suite" : null;
   const assistantRoute = path === "/assistente" || path.endsWith("/assistente");
+  const coveringsRoute = path === "/coberturas" || path.endsWith("/coberturas");
+  const coveringsHref = panelProfile ? `/painel/${panelProfile}/coberturas` : "/coberturas";
   const { state, isReady: controlsEnabled, status: syncStatus, toggle: sendToggle, adjustTemperature, setCoverPosition, applyScene } = useSmartHomeSync();
   const [floor, setFloor] = useState("Todos");
   const [toast, setToast] = useState("");
@@ -229,10 +233,10 @@ export default function Home() {
       setToast("A cena não foi confirmada pelo backend; nenhuma alteração foi aplicada.");
     });
   };
-  const activeLabel = assistantRoute ? "Assistente CASA+" : panelProfile ? `Central · ${panelProfile === "escritorio" ? "Escritório" : "Suíte"}` : nav.find(n => n.href === path)?.label ?? "Visão geral";
+  const activeLabel = assistantRoute ? "Assistente CASA+" : coveringsRoute ? "Cortinas e persianas" : panelProfile ? `Central · ${panelProfile === "escritorio" ? "Escritório" : "Suíte"}` : nav.find(n => n.href === path)?.label ?? "Visão geral";
   const syncLabel = syncStatus === "connected" ? "Simulação sincronizada" : syncStatus === "reconnecting" ? "Reconectando atualizações" : syncStatus === "offline" ? "Backend indisponível" : "Carregando estado";
   return <div className={`app-shell ${panelProfile ? "panel-profile" : ""}`}>
-    <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}><div className="brand"><span className="brand-mark"><House size={20} /><span /></span><span className="brand-copy"><strong>CASA<span>+</span></strong><small>INTELIGÊNCIA RESIDENCIAL</small></span><button className="mobile-close" onClick={() => setMobileOpen(false)} aria-label="Fechar menu"><X size={18}/></button></div><div className="side-label">CENTRAIS FIXAS</div><nav className="side-nav">{panelRoutes.map(item => { const Icon = item.icon; const selected = path === item.href || path === `${item.href}/assistente`; return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`nav-link ${selected ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{selected && <span className="nav-indicator"/>}</Link>; })}</nav><div className="side-label house-nav-label">PAINEL DA CASA</div><nav className="side-nav">{nav.map(item => { const Icon = item.icon; const selected = path === item.href || (item.href === "/assistente" && assistantRoute); return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`nav-link ${selected ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{selected && <span className="nav-indicator"/>}</Link>; })}</nav><div className="sidebar-bottom"><div className="connection-card"><span className="connection-icon"><Wifi size={16}/></span><div><strong>Home Assistant</strong><small><i/> Não conectado</small></div><MoreHorizontal size={16}/></div><div className="profile-row"><span className="profile-avatar">C</span><span><strong>Casa de referência</strong><small>Projeto residencial</small></span><ChevronDown size={15}/></div></div></aside>
+    <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}><div className="brand"><span className="brand-mark"><House size={20} /><span /></span><span className="brand-copy"><strong>CASA<span>+</span></strong><small>INTELIGÊNCIA RESIDENCIAL</small></span><button className="mobile-close" onClick={() => setMobileOpen(false)} aria-label="Fechar menu"><X size={18}/></button></div><div className="side-label">CENTRAIS FIXAS</div><nav className="side-nav">{panelRoutes.map(item => { const Icon = item.icon; const selected = path === item.href || path.startsWith(`${item.href}/`); return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`nav-link ${selected ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{selected && <span className="nav-indicator"/>}</Link>; })}</nav><div className="side-label house-nav-label">PAINEL DA CASA</div><nav className="side-nav">{nav.map(item => { const Icon = item.icon; const target = item.href === "/coberturas" ? coveringsHref : item.href; const selected = path === target || (item.href === "/assistente" && assistantRoute); return <Link key={item.href} href={target} onClick={() => setMobileOpen(false)} className={`nav-link ${selected ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{selected && <span className="nav-indicator"/>}</Link>; })}</nav><div className="sidebar-bottom"><div className="connection-card"><span className="connection-icon"><Wifi size={16}/></span><div><strong>Home Assistant</strong><small><i/> Não conectado</small></div><MoreHorizontal size={16}/></div><div className="profile-row"><span className="profile-avatar">C</span><span><strong>Casa de referência</strong><small>Projeto residencial</small></span><ChevronDown size={15}/></div></div></aside>
     <div className="main-shell"><header className="topbar"><button className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="Abrir menu"><Menu size={20}/></button><div className="breadcrumb"><span>Casa Inteligente</span><ChevronRight size={14}/><strong>{activeLabel}</strong></div><div className="topbar-right"><span className={`topbar-status sync-status-${syncStatus}`} aria-live="polite"><span className={`tiny-dot ${syncStatus === "connected" ? "" : "amber"}`}/> {syncLabel}</span><button className="icon-button" aria-label="Notificações"><Bell size={18}/><i/></button><span className="top-avatar">C</span></div></header><main className="page-content">
       {syncStatus !== "connected" && <div className={`sync-notice sync-notice-${syncStatus}`} role={syncStatus === "offline" ? "alert" : "status"}><span className="sync-notice-icon"><Activity size={17} /></span><div><strong>{syncStatus === "loading" ? "Carregando o estado compartilhado" : syncStatus === "offline" ? "Estado do backend indisponível" : "Atualização em tempo real reconectando"}</strong><span>{syncStatus === "loading" ? "Os valores exibidos são ilustrativos até o servidor confirmar o snapshot." : syncStatus === "offline" ? "Valores exibidos são apenas fallback; comandos estão desativados e nenhum estado é confirmado." : "O último snapshot confirmado continua disponível; novos eventos serão retomados automaticamente."}</span></div></div>}
       {(path === "/" || path === "/painel/escritorio" || path === "/painel/suite") && <Overview state={state} toggle={toggle} scene={scene} setCover={setCover} profile={panelProfile} controlsEnabled={controlsEnabled}/>}
@@ -241,11 +245,12 @@ export default function Home() {
       {path === "/plantas" && <PlantsPage/>}
       {path === "/materiais" && <MaterialsPage/>}
       {path === "/circuitos" && <CircuitsPage/>}
+      {coveringsRoute && <CoveringsPanel profile={panelProfile} state={state} controlsEnabled={controlsEnabled} onSetPosition={setCover}/>}
       {assistantRoute && <VoiceAssistant backendAvailable={controlsEnabled}/>}
       <footer className="page-footer"><span>CASA+ <i>•</i> Projeto conceitual de automação residencial</span><span>{controlsEnabled ? "Estado simulado compartilhado · nenhum hardware conectado" : "Aguardando estado confirmado do backend"}</span></footer>
     </main></div>
     {mobileOpen && <button className="scrim" onClick={() => setMobileOpen(false)} aria-label="Fechar navegação"/>}
-    <nav className="mobile-nav">{[nav[0], nav[1], nav[6], nav[2], nav[5]].map(item => { const Icon = item.icon; const selected = path === item.href || (item.href === "/assistente" && assistantRoute); return <Link key={item.href} href={item.href} className={`mobile-nav-item ${selected ? "mobile-nav-active" : ""}`}><Icon size={19}/><span>{item.label === "Visão geral" ? "Início" : item.label === "Assistente CASA+" ? "Assistente" : item.label === "Climatização" ? "Clima" : item.label}</span></Link>; })}</nav>
+    <nav className="mobile-nav">{[nav[0], nav[1], nav[2], nav[3], nav[7]].map(item => { const Icon = item.icon; const target = item.href === "/coberturas" ? coveringsHref : item.href; const selected = path === target || (item.href === "/assistente" && assistantRoute); return <Link key={item.href} href={target} className={`mobile-nav-item ${selected ? "mobile-nav-active" : ""}`}><Icon size={19}/><span>{item.label === "Visão geral" ? "Início" : item.label === "Assistente CASA+" ? "Assistente" : item.label === "Climatização" ? "Clima" : item.label}</span></Link>; })}</nav>
     {toast && <div className={`toast ${toastKind === "error" ? "toast-error" : ""}`} role={toastKind === "error" ? "alert" : "status"}>{toastKind === "error" ? <X size={17}/> : <Check size={17}/ >}{toast}</div>}
   </div>;
 }

@@ -10,6 +10,7 @@ function Router() {
   return <Switch>
     <Route path="/" component={Home} />
     <Route path="/ambientes" component={Home} />
+    <Route path="/coberturas" component={Home} />
     <Route path="/climatizacao" component={Home} />
     <Route path="/plantas" component={Home} />
     <Route path="/materiais" component={Home} />
@@ -19,6 +20,8 @@ function Router() {
     <Route path="/painel/suite" component={Home} />
     <Route path="/painel/escritorio/assistente" component={Home} />
     <Route path="/painel/suite/assistente" component={Home} />
+    <Route path="/painel/escritorio/coberturas" component={Home} />
+    <Route path="/painel/suite/coberturas" component={Home} />
     <Route path="/404" component={NotFound} />
     <Route component={NotFound} />
   </Switch>;

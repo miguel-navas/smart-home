@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { AirVent, ChevronRight, CloudSun, House, LockKeyhole, MessagesSquare } from "lucide-react";
+import { AirVent, ChevronRight, CloudSun, House, LockKeyhole, MessagesSquare, PanelTop } from "lucide-react";
 import { Link } from "wouter";
 import type { SmartHomeScene } from "@shared/smart-home";
 
@@ -60,6 +60,7 @@ export default function FixedPanelHome({
               {panel.label}
             </Link>
           ))}
+          <Link className="panel-cover-link" href={`/painel/${profile}/coberturas`}><PanelTop size={17} />Coberturas</Link>
           <Link className="panel-assistant-link" href={`/painel/${profile}/assistente`}><MessagesSquare size={17} />Assistente</Link>
         </nav>
       </header>
