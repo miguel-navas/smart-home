@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -25,4 +25,25 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
-// TODO: Add your tables here
+/**
+ * Legacy managed-MySQL simulation table from the first backend attempt.
+ * Retained with its applied migration/data; the current development simulator uses SQLite.
+ */
+export const smartHomeDevices = mysqlTable("smart_home_devices", {
+  deviceKey: varchar("deviceKey", { length: 32 }).primaryKey(),
+  lightOn: boolean("lightOn").default(false).notNull(),
+  climateOn: boolean("climateOn").default(false).notNull(),
+  temperature: int("temperature").default(22).notNull(),
+  hoodOn: boolean("hoodOn").default(false).notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/** Legacy MySQL revision row; retained for migration history and not read by the SQLite simulator. */
+export const smartHomeSync = mysqlTable("smart_home_sync", {
+  id: int("id").primaryKey(),
+  revision: int("revision").default(0).notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SmartHomeDevice = typeof smartHomeDevices.$inferSelect;
+export type SmartHomeSync = typeof smartHomeSync.$inferSelect;

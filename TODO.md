@@ -32,10 +32,25 @@
 - Disponibilizar uma tela/URL direta para a central do escritório (`/painel/escritorio`) e outra para a central da suíte (`/painel/suite`).
 - Ambas as telas podem controlar toda a casa; diferenciar os atalhos/favoritos conforme o local. Usar o mesmo app e prever um Home Assistant compartilhado como fonte canônica quando houver integração real; não criar dois gateways/controladores independentes.
 - Projetar as telas para toque e deixar as rotas fáceis de abrir/fixar nos dois dispositivos.
-- No protótipo, marcar estados e comandos como demonstrativos: armazenamento atual é local por navegador, não sincroniza entre telas e não aciona equipamentos.
+- Marcar estados e comandos como demonstrativos; nenhuma tela deve alegar que acionou equipamento real.
 - Incluir dois painéis fixos e acessórios de montagem/alimentação/rede a definir na lista preliminar; refletir os dois clientes no diagrama funcional.
 
-## [ ] Integração real e sincronização das duas centrais
+## [x] Backend compartilhado para simulação e sincronização das duas centrais
+- Criar a branch `feature/shared-backend-ha-simulation` a partir do estado aprovado, preservando a branch `main`.
+- Remover estado de dispositivos de `localStorage` e da memória do navegador. Os painéis do escritório (`/painel/escritorio`), da suíte (`/painel/suite`) e o app móvel devem ler o mesmo snapshot de dispositivos persistido no arquivo SQLite local do backend de desenvolvimento; a persistência deve sobreviver a atualização/reabertura de página e reinício do servidor. A SQLite desta etapa atende clientes da mesma instância de backend e não é armazenamento de produção para réplicas em hosts/contêineres distintos.
+- Enviar comandos pela API comum do backend, validar ambiente, capacidade e valor antes da gravação e alterar o estado do dispositivo e a revisão compartilhada na mesma transação SQLite; o backend só confirma sucesso após persistir a mudança.
+- Publicar uma rota SSE que observa a revisão persistida em SQLite e notifica os clientes; ao receber a mudança, cada painel refaz a leitura do snapshot. Ao conectar ou reconectar, cada tela carrega o snapshot atual, evitando depender de notificações perdidas ou do estado apenas em memória do servidor.
+- Manter as ações na simulação: luzes, zonas de climatização autorizadas, coifa/exaustão e temperaturas demonstrativas; lavabo, jardim de inverno, churrasqueira e os dois banheiros permanecem sem zona de ar. Não acionar nenhum dispositivo físico nesta entrega.
+- Isolar o armazenamento da simulação atrás de contrato, para uma implementação SQL Server futura substituir SQLite sem alterar a interface; manter o Home Assistant como integração física futura separada. URL/token do Home Assistant devem ficar no servidor; entidades e ações reais exigirão autenticação e allowlist antes de habilitar controle físico.
+- Manter favoritos específicos do escritório e da suíte, mas refletir entre os painéis e o celular o estado comum do mesmo cômodo; expor indisponibilidade, espera, erro e reconexão sem simular sucesso.
+- Documentar o fluxo navegador → API → transação SQLite no desenvolvimento → revisão persistente → SSE → nova consulta dos clientes; explicar os limites da simulação, do futuro adaptador SQL Server e da integração Home Assistant.
+
+## [ ] Preparar persistência de produto em SQL Server
+- Nesta branch, SQL Server é alvo arquitetural futuro: implementar e validar o adaptador somente quando houver ambiente/credenciais de produto; não declarar que a aplicação já se conecta a SQL Server.
+- Antes de publicar múltiplas instâncias ou vender o produto, substituir o arquivo SQLite local por persistência compartilhada SQL Server, validar transações/concorrência e manter Home Assistant como fonte canônica dos estados físicos conforme decisão de integração.
+- Preservar tabelas e histórico de migração MySQL já existentes; não executar DROP nem apagar estados para fazer a troca de desenvolvimento.
+
+## [ ] Integração real e controle de equipamentos com Home Assistant
 - Definir tamanho/modelo, fixação, alimentação e rede de cada tela; instalar/configurar um único controlador Home Assistant e os dispositivos/protocolos compatíveis.
-- Proteger o acesso com autenticação adequada e backend seguro, sem credenciais no navegador; ambas as telas devem receber os mesmos estados do controlador e confirmar o resultado real de cada comando.
+- Proteger o acesso com autenticação adequada e backend seguro, sem credenciais no navegador; as duas telas devem consultar a fonte de estado real do Home Assistant e confirmar o resultado real de cada comando.
 - Hardware, credenciais, conectividade e integração real ainda não foram fornecidos ou configurados; não apresentar o protótipo atual como operação de equipamentos.

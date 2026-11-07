@@ -7,27 +7,10 @@ import {
   Plug, Power, ShieldCheck, Sofa, Sparkles, Thermometer, WashingMachine,
   Wifi, Wind, X,
 } from "lucide-react";
+import { type DeviceKey, type DeviceState, type SmartHomeScene, type ToggleCapability } from "@shared/smart-home";
+import { useSmartHomeSync } from "../hooks/useSmartHomeSync";
 
-type DeviceKey = "sala" | "jantar" | "cozinha" | "escritorio" | "lavanderia" | "garagem" | "suite" | "quarto2" | "quarto3" | "churrasqueira" | "lavabo" | "banheiro" | "banhoSuite" | "jardim";
-type DeviceState = Record<DeviceKey, { light: boolean; climate: boolean; temp: number; hood: boolean }>;
 type PanelProfile = "escritorio" | "suite";
-
-const initialState: DeviceState = {
-  sala: { light: true, climate: true, temp: 22, hood: false },
-  jantar: { light: false, climate: false, temp: 23, hood: false },
-  cozinha: { light: true, climate: false, temp: 23, hood: false },
-  escritorio: { light: true, climate: true, temp: 22, hood: false },
-  lavanderia: { light: false, climate: false, temp: 24, hood: false },
-  garagem: { light: false, climate: false, temp: 25, hood: false },
-  suite: { light: false, climate: true, temp: 21, hood: false },
-  quarto2: { light: false, climate: false, temp: 22, hood: false },
-  quarto3: { light: false, climate: false, temp: 22, hood: false },
-  churrasqueira: { light: false, climate: false, temp: 24, hood: false },
-  lavabo: { light: false, climate: false, temp: 23, hood: false },
-  banheiro: { light: false, climate: false, temp: 23, hood: false },
-  banhoSuite: { light: false, climate: false, temp: 22, hood: false },
-  jardim: { light: false, climate: false, temp: 24, hood: false },
-};
 
 const nav = [
   { href: "/", label: "Visão geral", icon: House },
@@ -52,41 +35,31 @@ const rooms: { key: DeviceKey; name: string; floor: string; detail: string; icon
   { key: "suite", name: "Suíte + closet", floor: "Superior", detail: "Conforto e iluminação", icon: House , climate: true },
   { key: "quarto2", name: "Quarto 02", floor: "Superior", detail: "Conforto e iluminação", icon: House , climate: true },
   { key: "quarto3", name: "Quarto 03", floor: "Superior", detail: "Conforto e iluminação", icon: House , climate: true },
-  { key: "lavabo", name: "Lavabo", floor: "Térreo", detail: "Iluminação e conforto", icon: DoorOpen , climate: false },
-  { key: "banheiro", name: "Banheiro compartilhado", floor: "Superior", detail: "Iluminação e conforto", icon: DoorOpen , climate: false },
-  { key: "banhoSuite", name: "Banho da suíte", floor: "Superior", detail: "Iluminação e conforto", icon: DoorOpen , climate: false },
-  { key: "jardim", name: "Jardim de inverno", floor: "Térreo", detail: "Iluminação e conforto", icon: CloudSun , climate: false },
+  { key: "lavabo", name: "Lavabo", floor: "Térreo", detail: "Iluminação", icon: DoorOpen , climate: false },
+  { key: "banheiro", name: "Banheiro compartilhado", floor: "Superior", detail: "Iluminação", icon: DoorOpen , climate: false },
+  { key: "banhoSuite", name: "Banho da suíte", floor: "Superior", detail: "Iluminação", icon: DoorOpen , climate: false },
+  { key: "jardim", name: "Jardim de inverno", floor: "Térreo", detail: "Iluminação e ventilação natural", icon: CloudSun , climate: false },
 ];
-
-function getSavedState(): DeviceState {
-  if (typeof window === "undefined") return initialState;
-  try {
-    const saved = localStorage.getItem("casa-inteligente-demo");
-    if (!saved) return initialState;
-    const parsed = JSON.parse(saved) as Partial<DeviceState>;
-    return Object.fromEntries(Object.keys(initialState).map(key => [key, { ...initialState[key as DeviceKey], ...parsed[key as DeviceKey] }])) as DeviceState;
-  } catch { return initialState; }
-}
 
 function PageTitle({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle: string }) {
   return <div className="page-title"><div><div className="eyebrow">{eyebrow}</div><h1>{title}</h1><p>{subtitle}</p></div><span className="demo-pill"><span /> Modo demonstração</span></div>;
 }
 
-function Toggle({ checked, onClick, label }: { checked: boolean; onClick: () => void; label: string }) {
-  return <button className={`toggle ${checked ? "is-on" : ""}`} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onClick}><span /></button>;
+function Toggle({ checked, onClick, label, disabled = false }: { checked: boolean; onClick: () => void; label: string; disabled?: boolean }) {
+  return <button className={`toggle ${checked ? "is-on" : ""}`} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onClick} disabled={disabled}><span /></button>;
 }
 
-function RoomCard({ room, state, onLight, onClimate, onHood }: { room: typeof rooms[number]; state: DeviceState[DeviceKey]; onLight: () => void; onClimate: () => void; onHood: () => void }) {
+function RoomCard({ room, state, onLight, onClimate, onHood, controlsEnabled }: { room: typeof rooms[number]; state: DeviceState[DeviceKey]; onLight: () => void; onClimate: () => void; onHood: () => void; controlsEnabled: boolean }) {
   const Icon = room.icon;
   return <article className="room-card">
     <div className="room-card-top"><span className="room-icon"><Icon size={18} /></span><span className="room-floor">{room.floor}</span></div>
     <div className="room-name">{room.name}</div><div className="room-detail">{room.detail}</div>
     <div className="room-telemetry"><span><Thermometer size={14} /> {state.temp}°</span>{room.climate ? <span className={state.climate ? "live" : "muted-dot"}><span className="tiny-dot" />{state.climate ? "Clima ligado" : "Clima desligado"}</span> : <span className="muted-dot">Sem climatização</span>}</div>
-    <div className="room-controls"><label><Lightbulb size={15} /> Luz<Toggle checked={state.light} onClick={onLight} label={`Luz ${room.name}`} /></label>{room.climate && <label><AirVent size={15} /> Ar<Toggle checked={state.climate} onClick={onClimate} label={`Ar-condicionado ${room.name}`} /></label>}{(room.key === "cozinha" || room.key === "churrasqueira") && <label><Fan size={15} /> {room.key === "cozinha" ? "Coifa" : "Exaustão"}<Toggle checked={state.hood} onClick={onHood} label={`${room.key === "cozinha" ? "Coifa" : "Exaustão"} ${room.name}`} /></label>}</div>
+    <div className="room-controls"><label><Lightbulb size={15} /> Luz<Toggle checked={state.light} onClick={onLight} label={`Luz ${room.name}`} disabled={!controlsEnabled} /></label>{room.climate && <label><AirVent size={15} /> Ar<Toggle checked={state.climate} onClick={onClimate} label={`Ar-condicionado ${room.name}`} disabled={!controlsEnabled} /></label>}{(room.key === "cozinha" || room.key === "churrasqueira") && <label><Fan size={15} /> {room.key === "cozinha" ? "Coifa" : "Exaustão"}<Toggle checked={state.hood} onClick={onHood} label={`${room.key === "cozinha" ? "Coifa" : "Exaustão"} ${room.name}`} disabled={!controlsEnabled} /></label>}</div>
   </article>;
 }
 
-function Overview({ state, toggle, scene, profile = null }: { state: DeviceState; toggle: (key: DeviceKey, item: "light" | "climate" | "hood") => void; scene: (kind: string) => void; profile?: PanelProfile | null }) {
+function Overview({ state, toggle, scene, profile = null, controlsEnabled }: { state: DeviceState; toggle: (key: DeviceKey, item: ToggleCapability) => void; scene: (kind: SmartHomeScene) => void; profile?: PanelProfile | null; controlsEnabled: boolean }) {
   const onCount = useMemo(() => Object.values(state).reduce((total, s) => total + Number(s.light), 0), [state]);
   const profileName = profile === "escritorio" ? "Escritório" : "Suíte";
   const favoriteKeys: DeviceKey[] = profile === "suite" ? ["suite", "quarto2", "quarto3", "sala"] : ["escritorio", "sala", "jantar", "cozinha"];
@@ -95,30 +68,30 @@ function Overview({ state, toggle, scene, profile = null }: { state: DeviceState
     <PageTitle eyebrow={profile ? `CENTRAL FIXA · ${profileName.toUpperCase()}` : "CASA · RESUMO"} title={profile ? (profile === "escritorio" ? "Painel do Escritório" : "Painel da Suíte") : "Sua casa, em equilíbrio."} subtitle={profile ? "Atalhos personalizados deste local; os controles dão acesso à casa toda." : "Status geral e comandos rápidos para os ambientes."} />
     {profile && <section className="station-profile-banner"><span className="station-profile-icon"><PanelTop size={20} /></span><div><strong>Central fixa · {profileName}</strong><span>Perfil de tela deste local. Ambas as centrais têm acesso a todos os ambientes.</span></div><div className="station-switcher" aria-label="Alternar entre centrais">{panelRoutes.map(panel => <Link key={panel.href} href={panel.href} className={panel.href.endsWith(profile) ? "selected" : ""}>{panel.label}</Link>)}</div></section>}
     {!profile && <section className="section-block station-launch-section"><div className="section-heading"><div><div className="eyebrow">CENTRAIS FIXAS · TOUCHSCREEN</div><h2>Abrir um dos painéis da casa</h2></div><span className="section-note">Um no escritório · outro na suíte</span></div><div className="station-launch-grid">{panelRoutes.map(panel => <Link key={panel.href} href={panel.href} className="station-launch-card"><span className="station-launch-icon"><PanelTop size={21} /></span><span><strong>{panel.href.endsWith("suite") ? "Central da Suíte" : "Central do Escritório"}</strong><small>Atalhos próprios · controlar toda a casa</small></span><ChevronRight size={19} /></Link>)}</div></section>}
-    <div className="demo-banner"><span className="demo-banner-icon"><Activity size={17} /></span><div><strong>{profile ? "Prévia demonstrativa neste dispositivo" : "Ambiente de demonstração"}</strong><span>Estados e comandos são locais a este navegador. As duas telas não sincronizam nem controlam equipamentos até a integração com um único Home Assistant.</span></div><span className="demo-banner-tag">SIMULAÇÃO</span></div>
+    <div className="demo-banner"><span className="demo-banner-icon"><Activity size={17} /></span><div><strong>{controlsEnabled ? "Estado simulado compartilhado" : "Backend indisponível"}</strong><span>{controlsEnabled ? "Os estados persistem no backend e são sincronizados entre as duas centrais e o celular. Nenhum equipamento físico está conectado." : "O backend não confirmou o snapshot; comandos estão desativados para evitar mostrar sucesso sem persistência."}</span></div><span className="demo-banner-tag">SIMULAÇÃO</span></div>
     <section className="metrics-row" aria-label="Resumo da casa">
       <article className="metric-card metric-highlight"><span className="metric-label">Conforto interno</span><div className="metric-value">22,4<span>°C</span></div><div className="metric-foot"><CloudSun size={15} /> clima estável <span className="metric-good">· ideal</span></div><span className="metric-icon"><Thermometer size={18} /></span></article>
-      <article className="metric-card"><span className="metric-label">Iluminação ativa</span><div className="metric-value">{onCount}<span> / 10</span></div><div className="metric-foot">pontos de luz ligados</div><span className="metric-icon"><Lightbulb size={18} /></span></article>
+      <article className="metric-card"><span className="metric-label">Iluminação ativa</span><div className="metric-value">{onCount}<span> / 14</span></div><div className="metric-foot">ambientes com pontos de luz</div><span className="metric-icon"><Lightbulb size={18} /></span></article>
       <article className="metric-card"><span className="metric-label">Climatização</span><div className="metric-value">{rooms.filter(room => room.climate && state[room.key].climate).length}<span> zonas</span></div><div className="metric-foot">por ambiente · demonstração</div><span className="metric-icon"><AirVent size={18} /></span></article>
       <article className="metric-card"><span className="metric-label">Sistema</span><div className="metric-value metric-online">Em preparo</div><div className="metric-foot"><span className="tiny-dot amber" /> Home Assistant não conectado</div><span className="metric-icon"><Wifi size={18} /></span></article>
     </section>
-    <section className="section-block"><div className="section-heading"><div><div className="eyebrow">UM TOQUE</div><h2>Cenas da casa</h2></div><span className="section-note">Ações locais de demonstração</span></div><div className="scene-row">
-      <button className="scene-card" onClick={() => scene("cheguei")}><span className="scene-icon scene-green"><House size={19} /></span><span><strong>Cheguei</strong><small>Acender sala e escritório</small></span><ChevronRight size={17} /></button>
-      <button className="scene-card" onClick={() => scene("noite")}><span className="scene-icon scene-violet"><CloudSun size={19} /></span><span><strong>Boa noite</strong><small>Apagar luzes e clima</small></span><ChevronRight size={17} /></button>
-      <button className="scene-card" onClick={() => scene("sair")}><span className="scene-icon scene-amber"><LockKeyhole size={19} /></span><span><strong>Estou saindo</strong><small>Desligar luzes da casa</small></span><ChevronRight size={17} /></button>
+    <section className="section-block"><div className="section-heading"><div><div className="eyebrow">UM TOQUE</div><h2>Cenas da casa</h2></div><span className="section-note">Persistidas e sincronizadas · demonstração</span></div><div className="scene-row">
+      <button className="scene-card" disabled={!controlsEnabled} onClick={() => scene("cheguei")}><span className="scene-icon scene-green"><House size={19} /></span><span><strong>Cheguei</strong><small>Acender sala e escritório</small></span><ChevronRight size={17} /></button>
+      <button className="scene-card" disabled={!controlsEnabled} onClick={() => scene("noite")}><span className="scene-icon scene-violet"><CloudSun size={19} /></span><span><strong>Boa noite</strong><small>Apagar luzes e clima</small></span><ChevronRight size={17} /></button>
+      <button className="scene-card" disabled={!controlsEnabled} onClick={() => scene("sair")}><span className="scene-icon scene-amber"><LockKeyhole size={19} /></span><span><strong>Estou saindo</strong><small>Desligar luzes da casa</small></span><ChevronRight size={17} /></button>
     </div></section>
-    <section className="section-block"><div className="section-heading"><div><div className="eyebrow">{profile ? `ATALHOS · ${profileName.toUpperCase()}` : "ACESSO RÁPIDO"}</div><h2>{profile ? "Ambientes favoritos deste painel" : "Ambientes em destaque"}</h2></div><Link className="text-link" href="/ambientes">Controlar todos os ambientes <ChevronRight size={15} /></Link></div><div className={`room-grid ${profile ? "panel-favorites" : ""}`}>{quickRooms.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} />)}</div></section>
+    <section className="section-block"><div className="section-heading"><div><div className="eyebrow">{profile ? `ATALHOS · ${profileName.toUpperCase()}` : "ACESSO RÁPIDO"}</div><h2>{profile ? "Ambientes favoritos deste painel" : "Ambientes em destaque"}</h2></div><Link className="text-link" href="/ambientes">Controlar todos os ambientes <ChevronRight size={15} /></Link></div><div className={`room-grid ${profile ? "panel-favorites" : ""}`}>{quickRooms.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} controlsEnabled={controlsEnabled} />)}</div></section>
     <div className="safety-note"><ShieldCheck size={18} /><span><strong>Projeto em fase conceitual.</strong> Equipamentos, circuitos e dimensionamentos precisam de validação por profissionais habilitados.</span><Link href="/circuitos">Ver limites do desenho <ChevronRight size={15} /></Link></div>
   </>;
 }
-function RoomsPage({ state, toggle, floor, setFloor }: { state: DeviceState; toggle: (key: DeviceKey, item: "light" | "climate" | "hood") => void; floor: string; setFloor: (floor: string) => void }) {
+function RoomsPage({ state, toggle, floor, setFloor, controlsEnabled }: { state: DeviceState; toggle: (key: DeviceKey, item: ToggleCapability) => void; floor: string; setFloor: (floor: string) => void; controlsEnabled: boolean }) {
   const filtered = rooms.filter(r => floor === "Todos" || r.floor === floor);
-  return <><PageTitle eyebrow="CONTROLE POR ESPAÇO" title="Ambientes" subtitle="Iluminação e conforto por cômodo, com estados demonstrativos." /><div className="filter-row"><div className="segmented">{["Todos", "Térreo", "Superior"].map(f => <button key={f} className={floor === f ? "selected" : ""} onClick={() => setFloor(f)}>{f}</button>)}</div><span className="section-note"><span className="tiny-dot amber" /> 14 ambientes de demonstração</span></div><div className="room-grid room-grid-large">{filtered.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} />)}</div><div className="inline-note"><Lightbulb size={16} /> Os interruptores salvam o estado apenas neste navegador; não acionam relés nem equipamentos.</div></>;
+  return <><PageTitle eyebrow="CONTROLE POR ESPAÇO" title="Ambientes" subtitle="Iluminação e conforto por cômodo, com estados compartilhados de demonstração." /><div className="filter-row"><div className="segmented">{["Todos", "Térreo", "Superior"].map(f => <button key={f} className={floor === f ? "selected" : ""} onClick={() => setFloor(f)}>{f}</button>)}</div><span className="section-note"><span className="tiny-dot amber" /> 14 ambientes · simulados</span></div><div className="room-grid room-grid-large">{filtered.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} controlsEnabled={controlsEnabled} />)}</div><div className="inline-note"><Lightbulb size={16} /> Os estados são persistidos pelo backend e sincronizados entre as duas centrais e o celular; não acionam equipamentos reais.</div></>;
 }
 
-function ClimatePage({ state, toggle }: { state: DeviceState; toggle: (key: DeviceKey, item: "light" | "climate") => void }) {
+function ClimatePage({ state, toggle, controlsEnabled }: { state: DeviceState; toggle: (key: DeviceKey, item: ToggleCapability) => void; controlsEnabled: boolean }) {
   const climateRooms = rooms.filter(room => room.climate);
-  return <><PageTitle eyebrow="CONFORTO TÉRMICO" title="Climatização" subtitle="Zonas de ar-condicionado por cômodo — configuração ilustrativa." /><div className="climate-summary"><div className="climate-big"><span className="climate-glyph"><AirVent size={27} /></span><div><span className="eyebrow">REFERÊNCIA DEMONSTRATIVA</span><strong>22,4°</strong><small>temperatura média fictícia</small></div></div><div className="climate-hint"><Wind size={17} /><span>O conceito prevê um sistema central por zonas. A solução e a capacidade devem ser definidas após cálculo de carga térmica e projeto de climatização.</span></div></div><div className="climate-list">{climateRooms.map(r => <div className="climate-row" key={r.key}><span className="climate-room-icon"><AirVent size={17} /></span><div className="climate-room-name"><strong>{r.name}</strong><span>{r.floor} · leitura simulada</span></div><span className="climate-temp"><Thermometer size={15} />{state[r.key].temp}°</span><div className="temp-adjust"><button onClick={() => { const e = new CustomEvent("temp-adjust", { detail: { key: r.key, delta: -1 } }); window.dispatchEvent(e); }} aria-label={`Diminuir temperatura ${r.name}`}>−</button><span>{state[r.key].temp}°</span><button onClick={() => { const e = new CustomEvent("temp-adjust", { detail: { key: r.key, delta: 1 } }); window.dispatchEvent(e); }} aria-label={`Aumentar temperatura ${r.name}`}>+</button></div><Toggle checked={state[r.key].climate} onClick={() => toggle(r.key, "climate")} label={`Climatização ${r.name}`} /></div>)}</div><div className="inline-note"><Fan size={16} /> A referência “central” não define marca ou tecnologia. Compatibilidade com cada zona precisa ser verificada pelo projetista.</div></>;
+  return <><PageTitle eyebrow="CONFORTO TÉRMICO" title="Climatização" subtitle="Zonas de ar-condicionado por cômodo — configuração ilustrativa." /><div className="climate-summary"><div className="climate-big"><span className="climate-glyph"><AirVent size={27} /></span><div><span className="eyebrow">REFERÊNCIA DEMONSTRATIVA</span><strong>22,4°</strong><small>temperatura média fictícia</small></div></div><div className="climate-hint"><Wind size={17} /><span>O conceito prevê um sistema central por zonas. A solução e a capacidade devem ser definidas após cálculo de carga térmica e projeto de climatização.</span></div></div><div className="climate-list">{climateRooms.map(r => <div className="climate-row" key={r.key}><span className="climate-room-icon"><AirVent size={17} /></span><div className="climate-room-name"><strong>{r.name}</strong><span>{r.floor} · leitura simulada</span></div><span className="climate-temp"><Thermometer size={15} />{state[r.key].temp}°</span><div className="temp-adjust"><button disabled={!controlsEnabled} onClick={() => { const e = new CustomEvent("temp-adjust", { detail: { key: r.key, delta: -1 } }); window.dispatchEvent(e); }} aria-label={`Diminuir temperatura ${r.name}`}>−</button><span>{state[r.key].temp}°</span><button disabled={!controlsEnabled} onClick={() => { const e = new CustomEvent("temp-adjust", { detail: { key: r.key, delta: 1 } }); window.dispatchEvent(e); }} aria-label={`Aumentar temperatura ${r.name}`}>+</button></div><Toggle checked={state[r.key].climate} onClick={() => toggle(r.key, "climate")} label={`Climatização ${r.name}`} disabled={!controlsEnabled} /></div>)}</div><div className="inline-note"><Fan size={16} /> As temperaturas são fictícias; os comandos são persistidos e sincronizados, mas ainda não controlam equipamentos físicos. Ambientes excluídos do projeto não aparecem nesta lista.</div></>;
 }
 
 function PlantsPage() {
@@ -182,45 +155,55 @@ function CircuitsPage() {
 export default function Home() {
   const [path] = useLocation();
   const panelProfile: PanelProfile | null = path === "/painel/escritorio" ? "escritorio" : path === "/painel/suite" ? "suite" : null;
-  const [state, setState] = useState<DeviceState>(getSavedState);
+  const { state, isReady: controlsEnabled, status: syncStatus, toggle: sendToggle, adjustTemperature, applyScene } = useSmartHomeSync();
   const [floor, setFloor] = useState("Todos");
   const [toast, setToast] = useState("");
+  const [toastKind, setToastKind] = useState<"success" | "error">("success");
   const [mobileOpen, setMobileOpen] = useState(false);
-  useEffect(() => { localStorage.setItem("casa-inteligente-demo", JSON.stringify(state)); }, [state]);
   useEffect(() => {
     const handler = (event: Event) => {
-      const { key, delta } = (event as CustomEvent).detail;
-      setState(current => ({ ...current, [key]: { ...current[key as DeviceKey], temp: Math.max(16, Math.min(30, current[key as DeviceKey].temp + delta)) } }));
+      const { key, delta } = (event as CustomEvent<{ key: DeviceKey; delta: -1 | 1 }>).detail;
+      if (!controlsEnabled) return;
+      void adjustTemperature(key, delta).catch(() => {
+        setToastKind("error");
+        setToast("A temperatura não foi confirmada pelo backend; o estado não foi atualizado.");
+      });
     };
     window.addEventListener("temp-adjust", handler);
     return () => window.removeEventListener("temp-adjust", handler);
-  }, []);
+  }, [adjustTemperature, controlsEnabled]);
   useEffect(() => { if (!toast) return; const t = window.setTimeout(() => setToast(""), 2600); return () => window.clearTimeout(t); }, [toast]);
-  const toggle = (key: DeviceKey, item: "light" | "climate" | "hood") => setState(s => ({ ...s, [key]: { ...s[key], [item]: !s[key][item] } }));
-  const scene = (kind: string) => {
-    setState(s => {
-      const copy = { ...s };
-      if (kind === "cheguei") { copy.sala = { ...copy.sala, light: true }; copy.escritorio = { ...copy.escritorio, light: true }; }
-      if (kind === "noite") Object.keys(copy).forEach(k => { const key = k as DeviceKey; copy[key] = { ...copy[key], light: false, climate: false }; });
-      if (kind === "sair") Object.keys(copy).forEach(k => { const key = k as DeviceKey; copy[key] = { ...copy[key], light: false }; });
-      return copy;
+  const toggle = (key: DeviceKey, capability: ToggleCapability) => {
+    void sendToggle(key, capability).catch(() => {
+      setToastKind("error");
+      setToast("O comando não foi confirmado; nenhuma alteração foi aplicada na interface.");
     });
-    setToast(kind === "cheguei" ? "Cena ‘Cheguei’ aplicada neste navegador" : kind === "noite" ? "Cena ‘Boa noite’ aplicada neste navegador" : "Cena ‘Estou saindo’ aplicada neste navegador");
+  };
+  const scene = (kind: SmartHomeScene) => {
+    void applyScene(kind).then(() => {
+      setToastKind("success");
+      setToast(kind === "cheguei" ? "Cena ‘Cheguei’ salva e sincronizada" : kind === "noite" ? "Cena ‘Boa noite’ salva e sincronizada" : "Cena ‘Estou saindo’ salva e sincronizada");
+    }).catch(() => {
+      setToastKind("error");
+      setToast("A cena não foi confirmada pelo backend; nenhuma alteração foi aplicada.");
+    });
   };
   const activeLabel = panelProfile ? `Central · ${panelProfile === "escritorio" ? "Escritório" : "Suíte"}` : nav.find(n => n.href === path)?.label ?? "Visão geral";
+  const syncLabel = syncStatus === "connected" ? "Simulação sincronizada" : syncStatus === "reconnecting" ? "Reconectando atualizações" : syncStatus === "offline" ? "Backend indisponível" : "Carregando estado";
   return <div className={`app-shell ${panelProfile ? "panel-profile" : ""}`}>
     <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}><div className="brand"><span className="brand-mark"><House size={20} /><span /></span><span className="brand-copy"><strong>CASA<span>+</span></strong><small>INTELIGÊNCIA RESIDENCIAL</small></span><button className="mobile-close" onClick={() => setMobileOpen(false)} aria-label="Fechar menu"><X size={18}/></button></div><div className="side-label">CENTRAIS FIXAS</div><nav className="side-nav">{panelRoutes.map(item => { const Icon = item.icon; return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`nav-link ${path === item.href ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{path === item.href && <span className="nav-indicator"/>}</Link>; })}</nav><div className="side-label house-nav-label">PAINEL DA CASA</div><nav className="side-nav">{nav.map(item => { const Icon = item.icon; return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`nav-link ${path === item.href ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{path === item.href && <span className="nav-indicator"/>}</Link>; })}</nav><div className="sidebar-bottom"><div className="connection-card"><span className="connection-icon"><Wifi size={16}/></span><div><strong>Home Assistant</strong><small><i/> Não conectado</small></div><MoreHorizontal size={16}/></div><div className="profile-row"><span className="profile-avatar">C</span><span><strong>Casa de referência</strong><small>Projeto residencial</small></span><ChevronDown size={15}/></div></div></aside>
-    <div className="main-shell"><header className="topbar"><button className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="Abrir menu"><Menu size={20}/></button><div className="breadcrumb"><span>Casa Inteligente</span><ChevronRight size={14}/><strong>{activeLabel}</strong></div><div className="topbar-right"><span className="topbar-status"><span className="tiny-dot amber"/> Conexão de demonstração</span><button className="icon-button" aria-label="Notificações"><Bell size={18}/><i/></button><span className="top-avatar">C</span></div></header><main className="page-content">
-      {(path === "/" || panelProfile) && <Overview state={state} toggle={toggle} scene={scene} profile={panelProfile}/>}
-      {path === "/ambientes" && <RoomsPage state={state} toggle={toggle} floor={floor} setFloor={setFloor}/>}
-      {path === "/climatizacao" && <ClimatePage state={state} toggle={toggle}/>}
+    <div className="main-shell"><header className="topbar"><button className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="Abrir menu"><Menu size={20}/></button><div className="breadcrumb"><span>Casa Inteligente</span><ChevronRight size={14}/><strong>{activeLabel}</strong></div><div className="topbar-right"><span className={`topbar-status sync-status-${syncStatus}`} aria-live="polite"><span className={`tiny-dot ${syncStatus === "connected" ? "" : "amber"}`}/> {syncLabel}</span><button className="icon-button" aria-label="Notificações"><Bell size={18}/><i/></button><span className="top-avatar">C</span></div></header><main className="page-content">
+      {syncStatus !== "connected" && <div className={`sync-notice sync-notice-${syncStatus}`} role={syncStatus === "offline" ? "alert" : "status"}><span className="sync-notice-icon"><Activity size={17} /></span><div><strong>{syncStatus === "loading" ? "Carregando o estado compartilhado" : syncStatus === "offline" ? "Estado do backend indisponível" : "Atualização em tempo real reconectando"}</strong><span>{syncStatus === "loading" ? "Os valores exibidos são ilustrativos até o servidor confirmar o snapshot." : syncStatus === "offline" ? "Valores exibidos são apenas fallback; comandos estão desativados e nenhum estado é confirmado." : "O último snapshot confirmado continua disponível; novos eventos serão retomados automaticamente."}</span></div></div>}
+      {(path === "/" || panelProfile) && <Overview state={state} toggle={toggle} scene={scene} profile={panelProfile} controlsEnabled={controlsEnabled}/>}
+      {path === "/ambientes" && <RoomsPage state={state} toggle={toggle} floor={floor} setFloor={setFloor} controlsEnabled={controlsEnabled}/>}
+      {path === "/climatizacao" && <ClimatePage state={state} toggle={toggle} controlsEnabled={controlsEnabled}/>}
       {path === "/plantas" && <PlantsPage/>}
       {path === "/materiais" && <MaterialsPage/>}
       {path === "/circuitos" && <CircuitsPage/>}
-      <footer className="page-footer"><span>CASA+ <i>•</i> Projeto conceitual de automação residencial</span><span>Dados demonstrativos neste dispositivo</span></footer>
+      <footer className="page-footer"><span>CASA+ <i>•</i> Projeto conceitual de automação residencial</span><span>{controlsEnabled ? "Estado simulado compartilhado · nenhum hardware conectado" : "Aguardando estado confirmado do backend"}</span></footer>
     </main></div>
     {mobileOpen && <button className="scrim" onClick={() => setMobileOpen(false)} aria-label="Fechar navegação"/>}
     <nav className="mobile-nav">{[nav[0], nav[1], nav[3], nav[4], nav[5]].map(item => { const Icon = item.icon; return <Link key={item.href} href={item.href} className={`mobile-nav-item ${path === item.href ? "mobile-nav-active" : ""}`}><Icon size={19}/><span>{item.label === "Visão geral" ? "Início" : item.label === "Materiais" ? "Lista" : item.label === "Circuitos" ? "Circuitos" : item.label}</span></Link>; })}</nav>
-    {toast && <div className="toast"><Check size={17}/>{toast}</div>}
+    {toast && <div className={`toast ${toastKind === "error" ? "toast-error" : ""}`} role={toastKind === "error" ? "alert" : "status"}>{toastKind === "error" ? <X size={17}/> : <Check size={17}/ >}{toast}</div>}
   </div>;
 }
