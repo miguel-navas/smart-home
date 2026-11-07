@@ -1,0 +1,17 @@
+flowchart LR
+    Q[Quadro elétrico residencial<br/>proteções a dimensionar] --> G[Hub local único<br/>Home Assistant proposto · não configurado]
+    G --> S[Sensores<br/>temperatura, umidade, presença e abertura]
+    G --> A[Interfaces e atuadores<br/>compatíveis com as cargas]
+    G <--> N[Rede local<br/>Wi-Fi / Ethernet a definir]
+    subgraph C[Centrais fixas · clientes da mesma casa]
+        P1[Painel touchscreen<br/>Escritório · atalhos próprios]
+        P2[Painel touchscreen<br/>Suíte · atalhos próprios]
+    end
+    N <--> P1
+    N <--> P2
+    A --> H[Climatização<br/>zonas independentes]
+    A --> L[Iluminação<br/>comandos por ambiente]
+    A --> E[Exaustão<br/>coifa da cozinha e churrasqueira]
+    Q -. circuitos próprios .-> H
+    Q -. circuitos próprios .-> L
+    Q -. circuitos próprios .-> E

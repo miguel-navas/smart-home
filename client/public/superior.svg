@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1370" viewBox="0 0 760 1370" role="img" aria-labelledby="title desc">
+<title id="title">Planta conceitual do pavimento superior com três sacadas</title>
+<desc id="desc">Terreno de referência 10 por 25 metros, frente na parte inferior, corredor lateral externo de 2 metros à direita. Quarto 2 e quarto 3 nos fundos, cada um com armário embutido, espaço de mesa/computador e TV, sacadas voltadas aos fundos; hall de quartos e banheiro social; escada e vazio sobre o jardim de inverno; na frente, suíte com closet, banheiro próprio e sacada para a rua. Divisões internas esquemáticas, não em escala.</desc>
+<style>
+.bg{fill:#f6f7f2}.site{fill:#fffefa;stroke:#3d5548;stroke-width:4}.house{fill:#fffefa;stroke:#758a79;stroke-width:3}.room{stroke:#8b9d8d;stroke-width:2}.green{fill:#edf3e9}.warm{fill:#f7f0e5}.soft{fill:#f0f2ed}.garden{fill:#e7efe4}.lane{fill:#e9f0e9;stroke:#a2b3a2;stroke-width:2}.balcony{fill:#e7efe5;stroke:#90a28f;stroke-width:2}.label{font:700 17px Arial,sans-serif;fill:#34463a;text-anchor:middle}.small{font:500 14px Arial,sans-serif;fill:#68766b;text-anchor:middle}.tiny{font:700 13px Arial,sans-serif;fill:#526d59;text-anchor:middle}.dim{stroke:#738575;stroke-width:2}.dimtext{font:700 15px Arial,sans-serif;fill:#657567;text-anchor:middle}.road{stroke:#738575;stroke-width:3}.dash{stroke:#89998a;stroke-width:2;stroke-dasharray:8 6;fill:none}
+</style>
+<rect class="bg" width="760" height="1370"/>
+<text x="380" y="47" class="tiny" letter-spacing="3">CASA+ · ESTUDO CONCEITUAL</text>
+<text x="380" y="85" class="label" font-size="23">PAVIMENTO SUPERIOR · referência Planner 5D</text>
+<text x="340" y="126" class="dimtext">10 m · largura do terreno confirmada</text><line x1="180" y1="137" x2="580" y2="137" class="dim"/><line x1="180" y1="129" x2="180" y2="145" class="dim"/><line x1="580" y1="129" x2="580" y2="145" class="dim"/>
+<rect x="180" y="150" width="400" height="1000" class="site"/>
+<text x="340" y="177" class="tiny">FUNDOS</text>
+<!-- Balcões voltados aos fundos confirmados para os dois dormitórios -->
+<rect x="180" y="190" width="160" height="82" class="balcony"/><text x="260" y="231" class="tiny"><tspan x="260">Sacada · fundos</tspan><tspan x="260" dy="19" class="small">Quarto 2</tspan></text>
+<rect x="340" y="190" width="160" height="82" class="balcony"/><text x="420" y="231" class="tiny"><tspan x="420">Sacada · fundos</tspan><tspan x="420" dy="19" class="small">Quarto 3</tspan></text>
+<rect x="180" y="272" width="320" height="690" class="house"/>
+<rect x="180" y="272" width="160" height="195" class="room green"/><text x="260" y="345" class="label"><tspan x="260">Quarto 2</tspan><tspan x="260" dy="23" class="small">armário embutido</tspan><tspan x="260" dy="20" class="small">mesa / computador · TV</tspan></text>
+<rect x="340" y="272" width="160" height="195" class="room green"/><text x="420" y="345" class="label"><tspan x="420">Quarto 3</tspan><tspan x="420" dy="23" class="small">armário embutido</tspan><tspan x="420" dy="20" class="small">mesa / computador · TV</tspan></text>
+<rect x="180" y="467" width="180" height="120" class="room soft"/><text x="270" y="525" class="label">Hall dos quartos</text>
+<rect x="360" y="467" width="140" height="120" class="room warm"/><text x="430" y="515" class="label"><tspan x="430">Banheiro</tspan><tspan x="430" dy="22" class="small">social</tspan></text>
+<rect x="180" y="587" width="140" height="155" class="room soft"/><text x="250" y="650" class="label"><tspan x="250">Escada e</tspan><tspan x="250" dy="23">circulação</tspan></text>
+<rect x="320" y="587" width="180" height="155" class="room garden"/><text x="410" y="644" class="label"><tspan x="410">Vazio sobre</tspan><tspan x="410" dy="23" class="small">jardim de inverno</tspan></text>
+<!-- Suíte voltada para a frente, com closet e banho próprios -->
+<rect x="180" y="742" width="160" height="220" class="room green"/><text x="260" y="838" class="label"><tspan x="260">Suíte</tspan><tspan x="260" dy="24" class="small">dormitório do casal</tspan></text>
+<rect x="340" y="742" width="160" height="110" class="room soft"/><text x="420" y="797" class="label">Closet</text>
+<rect x="340" y="852" width="160" height="110" class="room warm"/><text x="420" y="897" class="label"><tspan x="420">Banho da</tspan><tspan x="420" dy="22" class="small">suíte</tspan></text>
+<rect x="180" y="962" width="160" height="82" class="balcony"/><text x="260" y="1003" class="tiny"><tspan x="260">Sacada da suíte</tspan><tspan x="260" dy="19" class="small">voltada à frente</tspan></text>
+<rect x="500" y="150" width="80" height="1000" class="lane"/><text x="540" y="650" class="tiny" transform="rotate(-90 540 650)">CORREDOR LATERAL EXTERNO · 2 m livres</text>
+<line x1="180" y1="1172" x2="580" y2="1172" class="road"/><text x="380" y="1202" class="label">FRENTE / RUA · lado de 10 m</text>
+<line x1="608" y1="150" x2="608" y2="1150" class="dim"/><line x1="600" y1="150" x2="616" y2="150" class="dim"/><line x1="600" y1="1150" x2="616" y2="1150" class="dim"/><text x="640" y="650" class="dimtext" transform="rotate(90 640 650)">25 m · profundidade confirmada</text>
+<path d="M205 1240h350" class="dash"/><text x="380" y="1270" class="small">Lote e corredor cotados; divisões internas esquemáticas, sem escala.</text><text x="380" y="1300" class="small">Aberturas, recuos e dimensões internas ainda precisam de levantamento.</text>
+</svg>

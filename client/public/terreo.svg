@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1370" viewBox="0 0 760 1370" role="img" aria-labelledby="title desc">
+<title id="title">Planta conceitual do térreo baseada na referência do Planner 5D</title>
+<desc id="desc">Terreno plano de 10 por 25 metros, rua no lado de 10 metros na frente, fundo com jardim externo e corredor lateral externo de 2 metros à direita. Churrasqueira e lavanderia nos fundos; jantar e cozinha; escada, jardim de inverno aberto ao céu; sala e escritório na frente com lavabo junto ao escritório; garagem para dois carros lado a lado e acesso frontal. Divisões internas esquemáticas, não em escala.</desc>
+<style>
+.bg{fill:#f6f7f2}.site{fill:#fffefa;stroke:#3d5548;stroke-width:4}.band{fill:#eaf0e8}.house{fill:#fffefa;stroke:#758a79;stroke-width:3}.room{stroke:#8b9d8d;stroke-width:2}.green{fill:#edf3e9}.warm{fill:#f7f0e5}.soft{fill:#f0f2ed}.garden{fill:#e7efe4}.lane{fill:#e9f0e9;stroke:#a2b3a2;stroke-width:2}.balcony{fill:#e7efe5;stroke:#90a28f;stroke-width:2}.label{font:700 17px Arial,sans-serif;fill:#34463a;text-anchor:middle}.small{font:500 14px Arial,sans-serif;fill:#68766b;text-anchor:middle}.tiny{font:700 13px Arial,sans-serif;fill:#526d59;text-anchor:middle}.dim{stroke:#738575;stroke-width:2}.dimtext{font:700 15px Arial,sans-serif;fill:#657567;text-anchor:middle}.road{stroke:#738575;stroke-width:3}.car{fill:#eef1ed;stroke:#adb9ad;stroke-width:2}.carline{stroke:#b3beb3;stroke-width:1.5;fill:none}.dash{stroke:#89998a;stroke-width:2;stroke-dasharray:8 6;fill:none}
+</style>
+<rect class="bg" width="760" height="1370"/>
+<text x="380" y="47" class="tiny" letter-spacing="3">CASA+ · ESTUDO CONCEITUAL</text>
+<text x="380" y="85" class="label" font-size="23">TÉRREO · referência Planner 5D</text>
+<text x="340" y="126" class="dimtext">10 m · largura confirmada</text><line x1="180" y1="137" x2="580" y2="137" class="dim"/><line x1="180" y1="129" x2="180" y2="145" class="dim"/><line x1="580" y1="129" x2="580" y2="145" class="dim"/>
+<rect x="180" y="150" width="400" height="1000" class="site"/>
+<text x="340" y="178" class="tiny">FUNDOS</text>
+<text x="340" y="218" class="label">Jardim externo / fundos</text>
+<rect x="180" y="250" width="320" height="800" class="house"/>
+<!-- Fundos: churrasqueira e lavanderia -->
+<rect x="180" y="250" width="160" height="120" class="room warm"/><text x="260" y="300" class="label"><tspan x="260">Churrasqueira</tspan><tspan x="260" dy="23" class="small">área gourmet · coifa</tspan></text>
+<rect x="340" y="250" width="160" height="120" class="room soft"/><text x="420" y="312" class="label">Lavanderia</text>
+<!-- Área social -->
+<rect x="180" y="370" width="145" height="150" class="room green"/><text x="252" y="445" class="label">Sala de jantar</text>
+<rect x="325" y="370" width="175" height="150" class="room warm"/><text x="412" y="434" class="label"><tspan x="412">Cozinha</tspan><tspan x="412" dy="23" class="small">coifa</tspan></text>
+<!-- Circulação e jardim -->
+<rect x="180" y="520" width="130" height="150" class="room soft"/><text x="245" y="578" class="label"><tspan x="245">Escada e</tspan><tspan x="245" dy="22">circulação</tspan></text>
+<rect x="310" y="520" width="190" height="150" class="room garden"/><text x="405" y="578" class="label"><tspan x="405">Jardim de inverno</tspan><tspan x="405" dy="23" class="small">aberto ao céu</tspan></text>
+<!-- Frente: o lavabo foi colocado contíguo ao escritório conforme confirmação -->
+<rect x="180" y="670" width="140" height="150" class="room green"/><text x="250" y="724" class="label"><tspan x="250">Sala de estar</tspan><tspan x="250" dy="22" class="small">entrada social</tspan></text>
+<rect x="320" y="670" width="120" height="150" class="room soft"/><text x="380" y="717" class="label"><tspan x="380">Escritório</tspan><tspan x="380" dy="22" class="small">sofá · mesa/PC</tspan><tspan x="380" dy="20" class="small">e TV</tspan></text>
+<rect x="440" y="670" width="60" height="150" class="room warm"/><text x="470" y="737" class="tiny"><tspan x="470">Lavabo</tspan><tspan x="470" dy="19" class="small">junto ao</tspan><tspan x="470" dy="18" class="small">escritório</tspan></text>
+<!-- Garagem frontal para dois carros -->
+<rect x="180" y="820" width="270" height="230" class="room" fill="#f3f1eb"/><text x="315" y="839" class="tiny">Garagem · 2 carros lado a lado</text>
+<rect x="198" y="855" width="112" height="175" rx="20" class="car"/><path d="M210 900h88M210 982h88M222 878h64v128h-64z" class="carline"/>
+<rect x="320" y="855" width="112" height="175" rx="20" class="car"/><path d="M332 900h88M332 982h88M344 878h64v128h-64z" class="carline"/>
+<rect x="450" y="820" width="50" height="230" class="room garden"/><text x="475" y="925" class="tiny" transform="rotate(-90 475 925)">Jardim / acesso</text>
+<!-- Corredor externo lateral 2m, conforme a prancha -->
+<rect x="500" y="150" width="80" height="1000" class="lane"/>
+<text x="540" y="644" class="tiny" transform="rotate(-90 540 644)">CORREDOR LATERAL EXTERNO · 2 m livres</text>
+<line x1="180" y1="1172" x2="580" y2="1172" class="road"/><text x="380" y="1202" class="label">FRENTE / RUA · lado de 10 m</text>
+<line x1="608" y1="150" x2="608" y2="1150" class="dim"/><line x1="600" y1="150" x2="616" y2="150" class="dim"/><line x1="600" y1="1150" x2="616" y2="1150" class="dim"/><text x="640" y="650" class="dimtext" transform="rotate(90 640 650)">25 m · profundidade confirmada</text>
+<path d="M205 1240h350" class="dash"/><text x="380" y="1270" class="small">Lote e corredor cotados; divisões internas esquemáticas, sem escala.</text><text x="380" y="1300" class="small">Aberturas, recuos e dimensões internas ainda precisam de levantamento.</text>
+</svg>
