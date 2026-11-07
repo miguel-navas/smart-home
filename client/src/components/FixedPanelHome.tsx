@@ -46,7 +46,7 @@ export default function FixedPanelHome({
       <header className="panel-home-heading">
         <div>
           <div className="eyebrow">LAYOUT PROVISÓRIO · 10″ EM PAISAGEM</div>
-          <h1>Central do {profileName}</h1>
+          <h1>Central {profile === "suite" ? "da" : "do"} {profileName}</h1>
           <p>Favoritos deste local, com controles para toda a casa.</p>
         </div>
         <nav className="panel-profile-switcher" aria-label="Alternar perfil da central">

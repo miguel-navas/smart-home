@@ -160,3 +160,56 @@
   .panel-info-copy{flex-basis:calc(100% - 50px)}
   .panel-info-link{margin-left:48px}
 }
+
+
+/* Dark theme for the fixed touchscreen panels. */
+.panel-profile,.panel-profile .main-shell,.panel-profile .page-content{background:#111814;color:#e8eee8}
+.panel-profile .sidebar{background:#121c17;border-color:#29372f}
+.panel-profile .brand{border-color:#2b3931}
+.panel-profile .topbar{background:#18221c;border-color:#2b3931;color:#e3ebe4}
+.panel-profile .breadcrumb{color:#a5b0a7}
+.panel-profile .breadcrumb strong{color:#e5ece5}
+.panel-profile .topbar-status{color:#c0cbc1}
+.panel-profile .icon-button{color:#c3cec5}
+.panel-profile .icon-button:hover{background:#29372f}
+.panel-profile .top-avatar{background:#29372f;color:#dce8dd}
+.panel-profile .panel-home-heading .eyebrow,.panel-profile .panel-home-section-heading .eyebrow,.panel-profile .panel-info-copy .eyebrow{color:#9daf9f}
+.panel-profile .panel-home-heading h1,.panel-profile .panel-home-section-heading h2,.panel-profile .panel-info-copy h2{color:#eef3ee}
+.panel-profile .panel-home-heading p,.panel-profile .panel-section-note,.panel-profile .panel-info-copy p{color:#a5b0a7}
+.panel-profile .panel-profile-switcher a{background:#1a251f;border-color:#3a4a3f;color:#c5d3c7}
+.panel-profile .panel-profile-switcher a:hover{background:#233229;border-color:#54745d}
+.panel-profile .panel-profile-switcher a.selected{background:#416b50;border-color:#60926b;color:#f5fbf5}
+.panel-profile .panel-demo-strip{background:#1b2b21;border-color:#385642;color:#c5e2c8}
+.panel-profile .panel-demo-state i{background:#77c58e;box-shadow:0 0 0 4px #77c58e20}
+.panel-profile .panel-demo-label{color:#d9bd82}
+.panel-profile .panel-demo-strip.is-unavailable{background:#30201e;border-color:#70443e;color:#f0c2bb}
+.panel-profile .panel-demo-strip.is-unavailable .panel-demo-state i{background:#e27b6b;box-shadow:0 0 0 4px #e27b6b20}
+.panel-profile .panel-scene-button,.panel-profile .panel-info-card,.panel-profile .room-card{background:#1b2520;border-color:#35443a;color:#e7eee7;box-shadow:0 2px 8px #00000012}
+.panel-profile .panel-scene-button:hover,.panel-profile .room-card:hover{background:#202e26;border-color:#55735d}
+.panel-profile .panel-scene-button>svg{color:#a9b8aa}
+.panel-profile .panel-scene-copy strong,.panel-profile .room-name{color:#edf3ed}
+.panel-profile .panel-scene-copy small,.panel-profile .room-detail{color:#a7b1a8}
+.panel-profile .panel-scene-icon.tone-green{background:#253b2d;color:#9ad2a6}
+.panel-profile .panel-scene-icon.tone-violet{background:#302b3b;color:#c6b5e6}
+.panel-profile .panel-scene-icon.tone-amber{background:#3a3122;color:#e2c381}
+.panel-profile .room-icon,.panel-profile .panel-info-icon{background:#26372c;color:#a8d5ae}
+.panel-profile .room-floor{background:#27332b;color:#bbc9bc}
+.panel-profile .room-telemetry{border-color:#34433a;color:#c1cbc2}
+.panel-profile .room-telemetry .live{color:#96d1a2}
+.panel-profile .room-telemetry .muted-dot{color:#9ba69d}
+.panel-profile .room-controls label{color:#d0d9d0}
+.panel-profile .room-controls label>svg{color:#aab8ab}
+.panel-profile .panel-profile .toggle::before{background:#455249}
+.panel-profile .toggle::before{background:#46554b}
+.panel-profile .toggle.is-on::before{background:#4c9165}
+.panel-profile .toggle span{background:#f1f5f1;box-shadow:0 1px 4px #0008}
+.panel-profile .panel-info-link{color:#9ed5a7}
+.panel-profile .panel-info-link:hover{background:#263a2c}
+.panel-profile .sync-notice{background:#30291d;border-color:#665539;color:#ebd19b}
+.panel-profile .sync-notice>div span{color:#d1c3a3}
+.panel-profile .sync-notice-icon{background:#463a25;color:#edcb84}
+.panel-profile .sync-notice-offline{background:#321f1d;border-color:#70443e;color:#efc0b8}
+.panel-profile .sync-notice-offline>div span{color:#d9aaa2}
+.panel-profile .sync-notice-offline .sync-notice-icon{background:#4a2a25;color:#eb978b}
+.panel-profile :focus-visible{outline:3px solid #a1dda8;outline-offset:3px}
+@media(max-width:900px){.panel-profile .page-content{background:#111814}}

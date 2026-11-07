@@ -13,20 +13,20 @@ Três opções (probabilidades pequenas de amostragem de cauda):
 2. **Noite de automação** — 0,06: interface escura de sala de controle com cores luminosas.
 3. **Jardim conectado** — 0,08: natureza doméstica, tons de sálvia e interfaces acolhedoras.
 
-**Escolha proposta: Painel técnico editorial.**
+**Direção visual atualizada por solicitação do usuário: Noite de automação, com fundo escuro nas centrais fixas.**
 
-- **Movimento:** modernismo suíço aplicado a uma prancheta de arquitetura e instrumentação residencial.
-- **Princípios centrais:** leitura imediata do estado; precisão visual sem ruído; controles acessíveis; distinção clara entre dado simulado e equipamento conectado.
-- **Filosofia de cor:** base marfim e grafite para remeter a desenho técnico impresso; verde sálvia como assinatura de casa eficiente; âmbar reservado para alertas e exceções.
-- **Paradigma de layout:** navegação lateral de sala de controle no desktop; em celular, navegação inferior e cartões em coluna, mantendo a planta como foco visual.
-- **Elementos de assinatura:** traços finos de planta baixa; pontos circulares de telemetria; etiquetas de estado como em um quadro elétrico.
+- **Movimento:** interface de instrumentação doméstica noturna, calma e legível, inspirada em painéis de controle contemporâneos.
+- **Princípios centrais:** fundo escuro para conforto visual; cartões em tons mais claros que a base com contornos discretos; leitura rápida à distância; estados simulados distinguidos dos reais.
+- **Filosofia de cor:** carvão esverdeado para a superfície principal, superfícies elevadas em verde-grafite, verde-sálvia luminoso para ações ativas e âmbar para alertas e simulação.
+- **Paradigma de layout:** navegação lateral de sala de controle no desktop e nos painéis; em celular, navegação inferior e cartões em coluna, mantendo a planta como foco visual.
+- **Elementos de assinatura:** superfícies profundas com bordas verdes suaves; pontos luminosos de estado; controles de toque de alto contraste.
 - **Interação:** comandos com estado evidente e feedback imediato, confirmação apenas para ações de impacto; filtros de pavimento e cômodo atualizam conteúdo sem perder contexto.
 - **Animação:** transições curtas de 160–220 ms; pulsação discreta só em leituras simuladas recentes; nenhuma animação contínua que pareça indicar sensor real.
 - **Tipografia:** Manrope para interface, IBM Plex Mono para unidades, leituras e etiquetas; escala com títulos compactos, números destacados e texto de apoio legível.
 - **Essência da marca:** um centro de comando doméstico que transforma planta e instalações em uma visão operacional; personalidade: cuidadosa, clara, confiável.
 - **Voz:** direta e serena. Exemplos: “Tudo tranquilo por aqui.” / “Modo demonstração — conecte um gateway para usar equipamentos reais.”
 - **Marca/logotipo:** casa em contorno construída por duas linhas de circuito, com um ponto-sensor na interseção.
-- **Cor de assinatura:** verde sálvia profundo.
+- **Cor de assinatura:** verde sálvia luminoso sobre carvão esverdeado.
 
 ## Produto e arquitetura de implementação
 

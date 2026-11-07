@@ -40,6 +40,7 @@
 - Manter visíveis identificação do perfil, estado de conexão/sincronização do backend e aviso de modo demonstração; quando o backend não confirmar o estado, informar erro/indisponibilidade e desativar comandos em vez de indicar sucesso.
 - Exibir cenas rápidas, favoritos acionáveis do perfil local, resumo/acesso às zonas válidas de climatização e acesso a todos os ambientes; os dois painéis podem controlar a casa toda, mas mantêm favoritos diferentes e sincronizam o estado compartilhado.
 - Usar alvos principais de toque com pelo menos 48 px; conservar layout responsivo para celulares/PWA e para telas fora do modo paisagem.
+- Usar fundo escuro nas telas das centrais, com cartões/superfícies contrastantes, texto legível e cores de status distinguíveis.
 - Não exibir lavabo, jardim de inverno, churrasqueira nem os dois banheiros como zonas de ar-condicionado. Não acionar hardware físico; todos os estados desta tela continuam identificados como demonstração.
 
 ## [x] Backend compartilhado para simulação e sincronização das duas centrais
