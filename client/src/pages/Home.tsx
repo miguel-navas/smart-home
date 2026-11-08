@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
+import Simulator from "./Simulator";
 import {
   Activity, AirVent, ArrowDownRight, ArrowUpRight, Bell, BookOpen, Check,
   ChevronDown, ChevronRight, CircuitBoard, CloudSun, DoorOpen, Fan, Flame,
@@ -9,7 +10,18 @@ import {
 } from "lucide-react";
 
 type DeviceKey = "sala" | "jantar" | "cozinha" | "escritorio" | "lavanderia" | "garagem" | "suite" | "quarto2" | "quarto3" | "churrasqueira" | "lavabo" | "banheiro" | "banhoSuite" | "jardim";
-type DeviceState = Record<DeviceKey, { light: boolean; climate: boolean; temp: number; hood: boolean }>;
+type OpeningStatus = "open" | "closed" | "locked";
+type AccessState = {
+  door?: OpeningStatus;
+  window?: OpeningStatus;
+  blackoutOpen?: boolean;
+  curtainOpen?: boolean;
+};
+type DeviceState = Record<DeviceKey, AccessState & { light: boolean; climate: boolean; temp: number; hood: boolean }>;
+type UpdateAccess = (key: DeviceKey, patch: AccessState) => void;
+
+const blackoutRooms: ReadonlySet<DeviceKey> = new Set(["sala", "jantar", "escritorio", "suite", "quarto2", "quarto3"]);
+const windowRooms: ReadonlySet<DeviceKey> = new Set(["cozinha", "lavanderia"]);
 type PanelProfile = "escritorio" | "suite";
 
 const initialState: DeviceState = {
@@ -36,6 +48,7 @@ const nav = [
   { href: "/plantas", label: "Plantas", icon: PanelTop },
   { href: "/materiais", label: "Materiais", icon: BookOpen },
   { href: "/circuitos", label: "Circuitos", icon: CircuitBoard },
+  { href: "/simulador", label: "Simulador", icon: Activity },
 ];
 const panelRoutes = [
   { href: "/painel/escritorio", label: "Escritório", icon: PanelTop },
@@ -44,10 +57,10 @@ const panelRoutes = [
 const rooms: { key: DeviceKey; name: string; floor: string; detail: string; icon: typeof House; climate: boolean }[] = [
   { key: "sala", name: "Sala de estar", floor: "Térreo", detail: "Conforto e iluminação", icon: Sofa , climate: true },
   { key: "jantar", name: "Sala de jantar", floor: "Térreo", detail: "Iluminação", icon: Sparkles , climate: true },
-  { key: "cozinha", name: "Cozinha", floor: "Térreo", detail: "Iluminação e coifa", icon: Flame , climate: true },
+  { key: "cozinha", name: "Cozinha", floor: "Térreo", detail: "Iluminação e coifa", icon: Flame , climate: false },
   { key: "escritorio", name: "Escritório", floor: "Térreo", detail: "Conforto e iluminação", icon: PanelTop , climate: true },
-  { key: "lavanderia", name: "Lavanderia", floor: "Térreo", detail: "Iluminação", icon: WashingMachine , climate: true },
-  { key: "garagem", name: "Garagem", floor: "Térreo", detail: "Iluminação e acesso", icon: DoorOpen , climate: true },
+  { key: "lavanderia", name: "Lavanderia", floor: "Térreo", detail: "Iluminação", icon: WashingMachine , climate: false },
+  { key: "garagem", name: "Garagem", floor: "Térreo", detail: "Iluminação e acesso", icon: DoorOpen , climate: false },
   { key: "churrasqueira", name: "Churrasqueira", floor: "Térreo", detail: "Iluminação e exaustão", icon: Fan , climate: false },
   { key: "suite", name: "Suíte + closet", floor: "Superior", detail: "Conforto e iluminação", icon: House , climate: true },
   { key: "quarto2", name: "Quarto 02", floor: "Superior", detail: "Conforto e iluminação", icon: House , climate: true },
@@ -76,17 +89,69 @@ function Toggle({ checked, onClick, label }: { checked: boolean; onClick: () => 
   return <button className={`toggle ${checked ? "is-on" : ""}`} type="button" role="switch" aria-checked={checked} aria-label={label} onClick={onClick}><span /></button>;
 }
 
-function RoomCard({ room, state, onLight, onClimate, onHood }: { room: typeof rooms[number]; state: DeviceState[DeviceKey]; onLight: () => void; onClimate: () => void; onHood: () => void }) {
+function OpeningControl({ label, room, status = "closed", gate = false, onChange }: {
+  label: string;
+  room: string;
+  status?: OpeningStatus;
+  gate?: boolean;
+  onChange: (status: OpeningStatus) => void;
+}) {
+  return <label className="opening-control">
+    <span>{label}</span>
+    <select aria-label={`Simular estado de ${label} em ${room}`} value={gate && status === "closed" ? "locked" : status} onChange={event => onChange(event.target.value as OpeningStatus)}>
+      <option value="open">{gate ? "Aberto" : "Aberta"}</option>
+      {!gate && <option value="closed">Fechada · destrancada</option>}
+      <option value="locked">{gate ? "Trancado" : "Fechada · trancada"}</option>
+    </select>
+  </label>;
+}
+
+function RoomAccessControls({ room, state, updateAccess }: {
+  room: typeof rooms[number];
+  state: AccessState;
+  updateAccess: UpdateAccess;
+}) {
+  const hasBlackout = blackoutRooms.has(room.key);
+  const hasWindow = windowRooms.has(room.key);
+  const hasGate = room.key === "garagem";
+  if (!hasBlackout && !hasWindow && !hasGate) return null;
+
+  return <div className="room-controls room-access-controls">
+    <span className="eyebrow">ABERTURAS E PRIVACIDADE · SIMULAÇÃO</span>
+    <OpeningControl label={hasGate ? "Portão" : hasBlackout ? "Porta de vidro de correr" : "Porta"} room={room.name} status={state.door} gate={hasGate}
+      onChange={door => updateAccess(room.key, { door })} />
+    {hasWindow && <OpeningControl label="Janela" room={room.name} status={state.window}
+      onChange={window => updateAccess(room.key, { window })} />}
+    {hasBlackout && <label><span>Persiana blackout · {state.blackoutOpen ? "Aberta" : "Fechada"}</span>
+      <Toggle label={`Abrir persiana blackout · ${room.name}`} checked={state.blackoutOpen ?? false}
+        onClick={() => updateAccess(room.key, { blackoutOpen: !state.blackoutOpen })} />
+    </label>}
+    {room.key === "sala" && <label><span>Cortina · {state.curtainOpen ? "Aberta" : "Fechada"}</span>
+      <Toggle label="Abrir cortina da sala de estar" checked={state.curtainOpen ?? false}
+        onClick={() => updateAccess(room.key, { curtainOpen: !state.curtainOpen })} />
+    </label>}
+  </div>;
+}
+
+function RoomCard({ room, state, onLight, onClimate, onHood, updateAccess }: {
+  room: typeof rooms[number];
+  state: DeviceState[DeviceKey];
+  onLight: () => void;
+  onClimate: () => void;
+  onHood: () => void;
+  updateAccess: UpdateAccess;
+}) {
   const Icon = room.icon;
   return <article className="room-card">
     <div className="room-card-top"><span className="room-icon"><Icon size={18} /></span><span className="room-floor">{room.floor}</span></div>
     <div className="room-name">{room.name}</div><div className="room-detail">{room.detail}</div>
     <div className="room-telemetry"><span><Thermometer size={14} /> {state.temp}°</span>{room.climate ? <span className={state.climate ? "live" : "muted-dot"}><span className="tiny-dot" />{state.climate ? "Clima ligado" : "Clima desligado"}</span> : <span className="muted-dot">Sem climatização</span>}</div>
     <div className="room-controls"><label><Lightbulb size={15} /> Luz<Toggle checked={state.light} onClick={onLight} label={`Luz ${room.name}`} /></label>{room.climate && <label><AirVent size={15} /> Ar<Toggle checked={state.climate} onClick={onClimate} label={`Ar-condicionado ${room.name}`} /></label>}{(room.key === "cozinha" || room.key === "churrasqueira") && <label><Fan size={15} /> {room.key === "cozinha" ? "Coifa" : "Exaustão"}<Toggle checked={state.hood} onClick={onHood} label={`${room.key === "cozinha" ? "Coifa" : "Exaustão"} ${room.name}`} /></label>}</div>
+    <RoomAccessControls room={room} state={state} updateAccess={updateAccess} />
   </article>;
 }
 
-function Overview({ state, toggle, scene, profile = null }: { state: DeviceState; toggle: (key: DeviceKey, item: "light" | "climate" | "hood") => void; scene: (kind: string) => void; profile?: PanelProfile | null }) {
+function Overview({ state, toggle, scene, updateAccess, profile = null }: { state: DeviceState; updateAccess: UpdateAccess; toggle: (key: DeviceKey, item: "light" | "climate" | "hood") => void; scene: (kind: string) => void; profile?: PanelProfile | null }) {
   const onCount = useMemo(() => Object.values(state).reduce((total, s) => total + Number(s.light), 0), [state]);
   const profileName = profile === "escritorio" ? "Escritório" : "Suíte";
   const favoriteKeys: DeviceKey[] = profile === "suite" ? ["suite", "quarto2", "quarto3", "sala"] : ["escritorio", "sala", "jantar", "cozinha"];
@@ -107,13 +172,13 @@ function Overview({ state, toggle, scene, profile = null }: { state: DeviceState
       <button className="scene-card" onClick={() => scene("noite")}><span className="scene-icon scene-violet"><CloudSun size={19} /></span><span><strong>Boa noite</strong><small>Apagar luzes e clima</small></span><ChevronRight size={17} /></button>
       <button className="scene-card" onClick={() => scene("sair")}><span className="scene-icon scene-amber"><LockKeyhole size={19} /></span><span><strong>Estou saindo</strong><small>Desligar luzes da casa</small></span><ChevronRight size={17} /></button>
     </div></section>
-    <section className="section-block"><div className="section-heading"><div><div className="eyebrow">{profile ? `ATALHOS · ${profileName.toUpperCase()}` : "ACESSO RÁPIDO"}</div><h2>{profile ? "Ambientes favoritos deste painel" : "Ambientes em destaque"}</h2></div><Link className="text-link" href="/ambientes">Controlar todos os ambientes <ChevronRight size={15} /></Link></div><div className={`room-grid ${profile ? "panel-favorites" : ""}`}>{quickRooms.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} />)}</div></section>
+    <section className="section-block"><div className="section-heading"><div><div className="eyebrow">{profile ? `ATALHOS · ${profileName.toUpperCase()}` : "ACESSO RÁPIDO"}</div><h2>{profile ? "Ambientes favoritos deste painel" : "Ambientes em destaque"}</h2></div><Link className="text-link" href="/ambientes">Controlar todos os ambientes <ChevronRight size={15} /></Link></div><div className={`room-grid ${profile ? "panel-favorites" : ""}`}>{quickRooms.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} updateAccess={updateAccess} />)}</div></section>
     <div className="safety-note"><ShieldCheck size={18} /><span><strong>Projeto em fase conceitual.</strong> Equipamentos, circuitos e dimensionamentos precisam de validação por profissionais habilitados.</span><Link href="/circuitos">Ver limites do desenho <ChevronRight size={15} /></Link></div>
   </>;
 }
-function RoomsPage({ state, toggle, floor, setFloor }: { state: DeviceState; toggle: (key: DeviceKey, item: "light" | "climate" | "hood") => void; floor: string; setFloor: (floor: string) => void }) {
+function RoomsPage({ state, toggle, updateAccess, floor, setFloor }: { state: DeviceState; updateAccess: UpdateAccess; toggle: (key: DeviceKey, item: "light" | "climate" | "hood") => void; floor: string; setFloor: (floor: string) => void }) {
   const filtered = rooms.filter(r => floor === "Todos" || r.floor === floor);
-  return <><PageTitle eyebrow="CONTROLE POR ESPAÇO" title="Ambientes" subtitle="Iluminação e conforto por cômodo, com estados demonstrativos." /><div className="filter-row"><div className="segmented">{["Todos", "Térreo", "Superior"].map(f => <button key={f} className={floor === f ? "selected" : ""} onClick={() => setFloor(f)}>{f}</button>)}</div><span className="section-note"><span className="tiny-dot amber" /> 14 ambientes de demonstração</span></div><div className="room-grid room-grid-large">{filtered.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} />)}</div><div className="inline-note"><Lightbulb size={16} /> Os interruptores salvam o estado apenas neste navegador; não acionam relés nem equipamentos.</div></>;
+  return <><PageTitle eyebrow="CONTROLE POR ESPAÇO" title="Ambientes" subtitle="Iluminação, conforto, aberturas e privacidade por cômodo, com estados demonstrativos." /><div className="filter-row"><div className="segmented">{["Todos", "Térreo", "Superior"].map(f => <button key={f} className={floor === f ? "selected" : ""} onClick={() => setFloor(f)}>{f}</button>)}</div><span className="section-note"><span className="tiny-dot amber" /> 14 ambientes de demonstração</span></div><div className="room-grid room-grid-large">{filtered.map(r => <RoomCard key={r.key} room={r} state={state[r.key]} onLight={() => toggle(r.key, "light")} onClimate={() => toggle(r.key, "climate")} onHood={() => toggle(r.key, "hood")} updateAccess={updateAccess} />)}</div><div className="inline-note"><Lightbulb size={16} /> Altere os seletores de portas e janelas para simular os sensores. Os estados ficam neste navegador.</div></>;
 }
 
 function ClimatePage({ state, toggle }: { state: DeviceState; toggle: (key: DeviceKey, item: "light" | "climate") => void }) {
@@ -123,24 +188,25 @@ function ClimatePage({ state, toggle }: { state: DeviceState; toggle: (key: Devi
 
 function PlantsPage() {
   return <>
-    <PageTitle eyebrow="PLANTA CONCEITUAL" title="Plantas da casa" subtitle="Distribuição baseada na referência compartilhada do Planner 5D e nas confirmações do layout." />
+    <PageTitle eyebrow="PLANTA CONCEITUAL" title="Plantas da casa" subtitle="Esboços atualizados dos dois pavimentos com dimensões e áreas de estudo." />
+    <Link className="download-link" href="/simulador">Simular uma casa a partir das plantas</Link>
     <div className="plant-reference-banner">
       <span className="plant-reference-icon"><PanelTop size={19} /></span>
-      <div><strong>Terreno plano · 10 m × 25 m</strong><span>Rua na face de 10 m · corredor lateral externo de 2 m à direita · cotas internas ainda não fornecidas.</span></div>
-      <span className="demo-banner-tag">SEM ESCALA INTERNA</span>
+      <div><strong>Terreno plano · 10 m × 25 m</strong><span>Rua na face de 10 m · corredor lateral de 1,50 m indicado no esboço.</span></div>
+      <span className="demo-banner-tag">COTAS DE ESTUDO</span>
     </div>
     <div className="concept-plans-grid">
       <article className="concept-plan-card">
-        <div className="concept-plan-head"><div><div className="eyebrow">PAVIMENTO TÉRREO</div><h2>Fundos → frente / rua</h2></div><a className="download-link" href="/terreo.svg" download>Baixar SVG</a></div>
-        <figure className="concept-plan-figure"><img className="concept-plan-image" src="/terreo.svg" alt="Planta conceitual do térreo com jardim externo nos fundos, churrasqueira e lavanderia, jantar e cozinha, escada e jardim de inverno, sala, escritório com lavabo próximo e garagem frontal para dois carros." loading="lazy" /><figcaption>Lavabo junto ao escritório, conforme confirmado. A frente está na parte inferior do desenho.</figcaption></figure>
+        <div className="concept-plan-head"><div><div className="eyebrow">PAVIMENTO TÉRREO</div><h2>Fundos → frente / rua</h2></div><a className="download-link" href="/Pavimento%20t%C3%A9rreo@2x.png" download>Baixar PNG</a></div>
+        <figure className="concept-plan-figure"><img className="concept-plan-image" src="/Pavimento%20t%C3%A9rreo@2x.png" alt="Planta conceitual do térreo com jardim externo nos fundos, área gourmet, cozinha, área de serviço, jardim de inverno, salas, escritório, lavabo junto à escada e garagem para dois carros." loading="lazy" /><figcaption>A frente está na parte inferior do desenho.</figcaption></figure>
       </article>
       <article className="concept-plan-card">
-        <div className="concept-plan-head"><div><div className="eyebrow">PAVIMENTO SUPERIOR</div><h2>Sacadas nos quartos</h2></div><a className="download-link" href="/superior.svg" download>Baixar SVG</a></div>
-        <figure className="concept-plan-figure"><img className="concept-plan-image" src="/superior.svg" alt="Planta conceitual do superior com quartos 2 e 3 e sacadas voltadas aos fundos; hall, banheiro social, escada, vazio sobre jardim de inverno e suíte com closet, banheiro e sacada para a frente." loading="lazy" /><figcaption>Quartos 2 e 3 com sacadas para os fundos; sacada da suíte voltada à frente, conforme confirmado.</figcaption></figure>
+        <div className="concept-plan-head"><div><div className="eyebrow">PAVIMENTO SUPERIOR</div><h2>Sacadas nos quartos</h2></div><a className="download-link" href="/Pavimento%20superior@2x.png" download>Baixar PNG</a></div>
+        <figure className="concept-plan-figure"><img className="concept-plan-image" src="/Pavimento%20superior@2x.png" alt="Planta conceitual do superior com quartos 2 e 3 e sacadas voltadas aos fundos; corredor, banheiro social, escada, rouparia e suíte com closet, banheiro e sacada para a frente." loading="lazy" /><figcaption>Quartos 2 e 3 com sacadas para os fundos; sacada da suíte voltada à frente.</figcaption></figure>
       </article>
     </div>
-    <div className="plan-disclaimer"><span className="plan-ruler">10 × 25</span><div><strong>Estudo conceitual baseado no desenho compartilhado.</strong><span>Somente lote e corredor lateral têm medidas confirmadas; dimensões internas, portas/janelas e recuos precisam de levantamento. Não usar para obra.</span></div><span className="demo-banner-tag">NÃO EXECUTIVO</span></div>
-    <div className="inline-note"><ShieldCheck size={16} /> A nova distribuição preserva os ambientes da referência e as decisões confirmadas; a planta executiva deve ser validada por profissional local.</div>
+    <div className="plan-disclaimer"><span className="plan-ruler">10 × 25</span><div><strong>Estudo conceitual baseado no desenho compartilhado.</strong><span>As dimensões e áreas dos esboços são premissas de estudo. Não usar para obra.</span></div><span className="demo-banner-tag">NÃO EXECUTIVO</span></div>
+    <div className="inline-note"><ShieldCheck size={16} /> O esboço do térreo indica corredor de 1,50 m, enquanto o PRD registra 2 m como premissa anterior.</div>
   </>;
 }
 
@@ -197,6 +263,8 @@ export default function Home() {
   }, []);
   useEffect(() => { if (!toast) return; const t = window.setTimeout(() => setToast(""), 2600); return () => window.clearTimeout(t); }, [toast]);
   const toggle = (key: DeviceKey, item: "light" | "climate" | "hood") => setState(s => ({ ...s, [key]: { ...s[key], [item]: !s[key][item] } }));
+  const updateAccess: UpdateAccess = (key, patch) =>
+    setState(current => ({ ...current, [key]: { ...current[key], ...patch } }));
   const scene = (kind: string) => {
     setState(s => {
       const copy = { ...s };
@@ -211,10 +279,11 @@ export default function Home() {
   return <div className={`app-shell ${panelProfile ? "panel-profile" : ""}`}>
     <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}><div className="brand"><span className="brand-mark"><House size={20} /><span /></span><span className="brand-copy"><strong>CASA<span>+</span></strong><small>INTELIGÊNCIA RESIDENCIAL</small></span><button className="mobile-close" onClick={() => setMobileOpen(false)} aria-label="Fechar menu"><X size={18}/></button></div><div className="side-label">CENTRAIS FIXAS</div><nav className="side-nav">{panelRoutes.map(item => { const Icon = item.icon; return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`nav-link ${path === item.href ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{path === item.href && <span className="nav-indicator"/>}</Link>; })}</nav><div className="side-label house-nav-label">PAINEL DA CASA</div><nav className="side-nav">{nav.map(item => { const Icon = item.icon; return <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className={`nav-link ${path === item.href ? "nav-active" : ""}`}><Icon size={18} /><span>{item.label}</span>{path === item.href && <span className="nav-indicator"/>}</Link>; })}</nav><div className="sidebar-bottom"><div className="connection-card"><span className="connection-icon"><Wifi size={16}/></span><div><strong>Home Assistant</strong><small><i/> Não conectado</small></div><MoreHorizontal size={16}/></div><div className="profile-row"><span className="profile-avatar">C</span><span><strong>Casa de referência</strong><small>Projeto residencial</small></span><ChevronDown size={15}/></div></div></aside>
     <div className="main-shell"><header className="topbar"><button className="mobile-menu" onClick={() => setMobileOpen(true)} aria-label="Abrir menu"><Menu size={20}/></button><div className="breadcrumb"><span>Casa Inteligente</span><ChevronRight size={14}/><strong>{activeLabel}</strong></div><div className="topbar-right"><span className="topbar-status"><span className="tiny-dot amber"/> Conexão de demonstração</span><button className="icon-button" aria-label="Notificações"><Bell size={18}/><i/></button><span className="top-avatar">C</span></div></header><main className="page-content">
-      {(path === "/" || panelProfile) && <Overview state={state} toggle={toggle} scene={scene} profile={panelProfile}/>}
-      {path === "/ambientes" && <RoomsPage state={state} toggle={toggle} floor={floor} setFloor={setFloor}/>}
+      {(path === "/" || panelProfile) && <Overview state={state} toggle={toggle} scene={scene} updateAccess={updateAccess} profile={panelProfile}/>}
+      {path === "/ambientes" && <RoomsPage state={state} toggle={toggle} updateAccess={updateAccess} floor={floor} setFloor={setFloor}/>}
       {path === "/climatizacao" && <ClimatePage state={state} toggle={toggle}/>}
       {path === "/plantas" && <PlantsPage/>}
+      {path === "/simulador" && <Simulator/>}
       {path === "/materiais" && <MaterialsPage/>}
       {path === "/circuitos" && <CircuitsPage/>}
       <footer className="page-footer"><span>CASA+ <i>•</i> Projeto conceitual de automação residencial</span><span>Dados demonstrativos neste dispositivo</span></footer>

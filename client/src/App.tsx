@@ -12,6 +12,7 @@ function Router() {
     <Route path="/ambientes" component={Home} />
     <Route path="/climatizacao" component={Home} />
     <Route path="/plantas" component={Home} />
+    <Route path="/simulador" component={Home} />
     <Route path="/materiais" component={Home} />
     <Route path="/circuitos" component={Home} />
     <Route path="/painel/escritorio" component={Home} />

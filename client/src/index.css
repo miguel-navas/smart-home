@@ -27,3 +27,128 @@
 .station-launch-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.station-launch-card{min-height:82px;display:flex;align-items:center;gap:13px;padding:15px;background:#fffefa;border:1px solid #e4e8df;border-radius:12px;transition:border-color .16s,transform .16s}.station-launch-card:hover{border-color:#bfd0c0;transform:translateY(-1px)}.station-launch-icon{width:42px;height:42px;flex:0 0 auto;display:grid;place-items:center;border-radius:11px;background:#edf2e9;color:#52775e}.station-launch-card>span:nth-child(2){display:flex;flex-direction:column;gap:5px;flex:1}.station-launch-card strong{font-size:12px}.station-launch-card small{font-size:10px;color:#7f897f}.station-profile-banner{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:13px 15px;border:1px solid #dfe7dc;border-radius:11px;background:#edf2e9}.station-profile-icon{width:38px;height:38px;flex:0 0 auto;display:grid;place-items:center;background:#fffefa;border-radius:10px;color:#50755d}.station-profile-banner>div:nth-of-type(1){display:flex;flex-direction:column;gap:4px;flex:1}.station-profile-banner strong{font-size:11px}.station-profile-banner>div>span{font-size:10px;color:#718071}.station-switcher{display:flex;gap:6px}.station-switcher a{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 11px;border:1px solid #dfe5dc;border-radius:8px;background:#fffefa;color:#57735e;font-size:10px;font-weight:700}.station-switcher a.selected{background:#486f57;border-color:#486f57;color:#fff}.panel-profile .room-name{font-size:14px}.panel-profile .room-detail{font-size:10px}.panel-profile .room-controls label{min-height:44px;gap:9px;font-size:12px}.panel-profile .room-telemetry{font-size:10px}.panel-profile .toggle{position:relative;width:56px;min-width:56px;height:44px;min-height:44px;padding:0;background:transparent;justify-content:flex-start}.panel-profile .toggle::before{content:"";position:absolute;left:2px;right:2px;top:8px;bottom:8px;border-radius:20px;background:#dfe3dc;transition:background .2s}.panel-profile .toggle span{position:relative;z-index:1;width:22px;height:22px;transform:translateX(4px)}.panel-profile .toggle.is-on{background:transparent}.panel-profile .toggle.is-on::before{background:#5c9274}.panel-profile .toggle.is-on span{transform:translateX(30px)}.panel-profile .scene-card{min-height:70px}.house-nav-label{margin-top:18px}
 @media(max-width:760px){.station-launch-grid{grid-template-columns:1fr}.station-profile-banner{align-items:flex-start;flex-wrap:wrap}.station-profile-banner>div:nth-of-type(1){min-width:calc(100% - 60px)}.station-switcher{width:100%;margin-left:49px}.station-switcher a{min-height:44px;flex:1}.panel-profile .room-controls label{min-height:48px}}
 @media(max-width:390px){.station-launch-card{padding:12px}.panel-profile .panel-favorites{grid-template-columns:1fr}}
+
+.room-access-controls {
+  border-top: 1px solid #e5e8e1;
+  margin-top: 12px;
+  padding-top: 10px;
+}
+
+.room-access-controls .opening-control {
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.opening-control select {
+  max-width: 100%;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid #dce3da;
+  border-radius: 6px;
+  background: #fffefa;
+  color: #202b27;
+}
+
+.simulator h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.sim-note {
+  margin-bottom: 16px;
+}
+
+.sim-setup {
+  margin-bottom: 16px;
+}
+
+.sim-counts, .sim-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.sim-counts li {
+  padding: 4px 8px;
+  border: 1px solid #dce3da;
+  border-radius: 6px;
+}
+
+.sim-room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.simulator label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  font-size: .78rem;
+}
+
+.simulator input, .simulator select, .simulator button {
+  min-height: 40px;
+  max-width: 100%;
+  padding: 6px 9px;
+  border: 1px solid #dce3da;
+  border-radius: 6px;
+  background: #fffefa;
+  color: #202b27;
+}
+
+.simulator label input {
+  width: 100%;
+}
+
+.simulator button {
+  background: #eaf1e9;
+  cursor: pointer;
+  font-size: .78rem;
+  font-weight: 650;
+}
+
+.simulator button:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.simulator .sim-remove {
+  background: #fffefa;
+  color: #873d34;
+}
+
+.sim-devices {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sim-device {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f5f6f1;
+}
+
+.sim-device label:first-child {
+  flex: 1 1 120px;
+}
+
+.simulator label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.simulator label input[type="checkbox"] {
+  width: auto;
+  min-height: auto;
+}

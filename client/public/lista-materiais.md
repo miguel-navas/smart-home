@@ -1,36 +1,26 @@
-# Lista preliminar de materiais — casa inteligente
+# Casa+ — Lista preliminar de materiais por residência
 
-**Terreno:** 10 m × 25 m, plano. **Referência de layout:** Planner 5D, rua no lado de 10 m, fundos no extremo oposto e corredor externo lateral de 2 m à direita. A distribuição interna é esquemática; medidas internas, envelope da edificação e recuos legais ainda não foram definidos.
+Use esta lista para levantar pontos e preparar cotações. As quantidades de referência correspondem ao protótipo e variam por imóvel. As plantas novas são esboços. O térreo mostra corredor de 1,50 m e o PRD registra 2 m como premissa anterior.
 
-Esta lista é uma base para orçamento após definição de marcas, protocolos, cargas, planta final e exigências locais. Ela não é especificação de compra nem projeto executivo. Quantidades, bitolas, capacidade, proteção e compatibilidade devem ser determinadas por profissionais habilitados.
-
-| Grupo | Material / função | Estimativa inicial |
+| Grupo | Equipamentos e insumos | Referência para o protótipo |
 | --- | --- | --- |
-| Centrais fixas | Painel touchscreen/tablet fixo do escritório | 1 unidade; tamanho, modelo, sistema e montagem a escolher |
-| Centrais fixas | Painel touchscreen/tablet fixo da suíte | 1 unidade; tamanho, modelo, sistema e montagem a escolher |
-| Centrais fixas | Suportes/fixação, alimentação e ligação à rede | 2 pontos; solução depende dos painéis escolhidos e da instalação |
-| Controle | Hub/controlador local único (Home Assistant proposto) | 1 unidade para as duas telas; hardware/protocolo a escolher |
-| Controle | Módulos de comando para iluminação | Quantidade por circuito e carga, a definir |
-| Controle | Interfaces/contatores aprovados para climatização | 1 interface por zona definida após revisão do layout; validar fabricante |
-| Controle | Módulos de comando de coifa e exaustão | Cozinha e churrasqueira; solução compatível a dimensionar |
-| Controle | Caixas, fontes e acessórios dos módulos | Conforme topologia e local de instalação |
-| Sensoriamento | Sensor de temperatura e umidade | Como referência, 1 por zona aprovada de climatização; quantidade final a definir |
-| Sensoriamento | Sensor de presença | Ambientes e cobertura a validar |
-| Sensoriamento | Sensor de abertura | Portas/janelas selecionadas após planta de esquadrias |
-| Comandos locais | Interruptores e comandos manuais compatíveis | Conforme pontos e estratégia de contingência |
-| Rede | Roteador/switch e pontos de acesso Wi-Fi | Cobertura a verificar em projeto; pode exigir mais de um ponto |
-| Rede | Cabeamento, conectores e patch panel (se adotado) | Metragem e categoria a definir após levantamento |
-| Infraestrutura | Eletrodutos, caixas, eletrocalhas e identificação | Conforme planta elétrica e separação entre circuitos |
-| Quadros | Quadro(s) e reserva para automação | Dimensionados conforme carga e norma local |
-| Climatização | Sistema central por zonas, distribuição e controles | Sem zonas no lavabo, jardim de inverno, churrasqueira e banheiros; capacidade das demais zonas após cálculo térmico e compatibilidade a confirmar |
-| Exaustão | Coifa da cozinha e duto/acessórios | Vazão, percurso e descarga dimensionados |
-| Exaustão | Coifa/exaustão da área de churrasqueira | Seleção considerando calor, gordura, renovação e duto |
-| Proteção/segurança | Dispositivos de proteção, aterramento e seccionamento | Definidos no projeto elétrico, sem valores nesta lista |
+| Central e telas | Hub Home Assistant OS, coordenador se exigido pelo protocolo, telas, suportes e alimentação | Um hub e duas centrais fixas, escritório e suíte |
+| Portas de correr | Sensores de abertura e mecanismo com retorno de trava onde exigido | Seis conjuntos de referência, sala de estar, jantar, escritório, suíte e quartos 2 e 3. Confirmar vãos e folhas. |
+| Cozinha e lavanderia | Sensores de abertura e leitura de trava conforme esquadria | Uma porta e uma janela por ambiente como referência |
+| Portão | Automatizador compatível, retorno de posição, confirmação de trava e dispositivos de segurança do fabricante | Um portão. Validar operação manual. |
+| Persianas e cortina | Motores, controladores, alimentação e comando manual previsto pelo fabricante | Seis persianas blackout e um trilho motorizado para a cortina da sala |
+| Climatização | Interfaces por zona e sensores de temperatura e umidade quando necessários | Seis zonas no exemplo, sala de estar, jantar, escritório, suíte e quartos 2 e 3. Cozinha, lavanderia e garagem sem climatização. Dimensionar após cálculo térmico. |
+| Iluminação e exaustão | Interruptores, módulos compatíveis com a carga, coifa e dutos | Iluminação por circuito. Prever cozinha e área gourmet para exaustão. |
+| Sensores adicionais | Sensores de presença ou outros conforme a necessidade do imóvel, baterias de reposição | Definir por risco, cobertura e modelo. Registrar o tipo de bateria. |
+| Câmeras e gravação | Câmeras IP PoE, switch PoE, NVR e discos para retenção definida | Avaliar entrada, garagem, corredor lateral e fundos. Quantificar após revisar os ângulos e a privacidade. |
+| Rede | Roteador/firewall, switch, pontos de acesso, cabeamento, conectores e painel de distribuição quando adotado | Medir cobertura e definir pontos por pavimento. Segundo link depende da necessidade de acesso remoto durante falhas. |
+| Energia e infraestrutura | Nobreak, fontes, quadro e reserva, eletrodutos, caixas, eletrocalhas, aterramento e proteções | Dimensionar pelo consumo e autonomia das cargas essenciais. Projeto elétrico específico por imóvel. |
+| Backup | Destinos protegidos para cópias local e externa e armazenamento separado do kit de recuperação | Definir frequência, retenção, responsáveis e meta de recuperação. O volume de vídeo é tratado à parte. |
 
-## Critérios para cotação
+## Registro de pontos por imóvel
 
-1. Confirmar município, recuos, orientação solar, cotas internas, aberturas e posição dos quadros. Validar o desenho esquemático com profissional local antes de dimensionar.
-2. Selecionar os dois painéis (tamanho, modelo, fixação, alimentação e rede) e confirmar que serão clientes de um único controlador; dimensionar o hub e o protocolo conforme os dispositivos.
-3. Escolher o gateway e o protocolo e validar integração e operação local sem internet.
-4. Fechar projeto elétrico, climatização e exaustão, incluindo separação de potência/controle e operação manual de contingência.
-5. Solicitar quantitativos e especificações a engenheiro eletricista, profissional de automação, projetista de climatização e instalador de exaustão.
+| ID do ponto | Pavimento e cômodo | Equipamento e quantidade | Alimentação, rede e protocolo | Estado ou retorno exigido | Modelo e validação |
+| --- | --- | --- | --- | --- | --- |
+| A preencher | A preencher | A preencher | A preencher | A preencher | A confirmar |
+
+Antes da cotação, conferir os pontos na planta do imóvel, confirmar as capacidades dos equipamentos no hub, dimensionar energia e armazenamento e validar a operação local e manual. Ver a [arquitetura de implantação](arquitetura-implantacao-seguranca.md) para os critérios de continuidade e segurança.
